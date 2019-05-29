@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    
+        <title>Manage</title>
+    </head>
+
+    <body>
+        <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
+            <a class="navbar-brand" href="#">Sign In Tracker</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#">Sign In</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#">Sign Out</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#">Stats</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#">Manage</a>
+                </li>
+            </ul>
+        </nav>
+              
+
+        <div class="container-fluid" style="margin-top:80px">
+            <h1>Students</h1>
+            <!-- Add Student -->
+            <!-- Modify Student -->
+            <!-- Remove Student -->
+            <!-- ID, School ID?, First Name, Last Name, Gradutaiton Year, Grade (Derived)-->
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentAdd" id="addStudentButton">Add Student</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentModify" id="modifyStudentButton">Modify Student</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentRemove" id="removeStudentButton">Remove Student</button>
+
+            <table class="table table-dark">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">School ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                    <th scope="col">Graduation</th>
+                    <th scope="col">Grade</th>
+                </thead>
+                <tbody id="studentsTable">
+                    <!-- Populated by Javascript -->
+                </tbody>
+            </table>
+
+            <!-- Student Modals -->
+            <!-- Student Add -->
+            <div class="modal fade" id="studentAdd" tabindex="-1" role="dialog" aria-labelledby="studentAddLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Student Add</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Modify -->
+            <div class="modal fade" id="studentModify" tabindex="-1" role="dialog" aria-labelledby="studentRemoveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Student Modify</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Student Remove -->
+            <div class="modal fade" id="studentRemove" tabindex="-1" role="dialog" aria-labelledby="studentRemoveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Remove Student</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1>Mentors</h1>
+            <!-- Add Mentor -->
+            <!-- Modify Mentor -->
+            <!-- Remove Mentor -->
+            <!-- ID, First Name, Last Name -->
+
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorAdd" id="addMentorButton">Add Mentor</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorModify" id="modifyMentorButton">Modify Mentor</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorRemove" id="removeMentorButton">Remove Mentor</button>
+
+            <table class="table table-dark">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">First Name</th>
+                    <th scope="col">Last Name</th>
+                </thead>
+                <tbody id="mentorsTable">
+                    <!-- Populated by Javascript -->
+                </tbody>
+            </table>
+    
+
+            <!-- Mentor Modals -->
+            <!-- Mentor Add -->
+            <div class="modal fade" id="mentorAdd" tabindex="-1" role="dialog" aria-labelledby="mentorAddLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Mentor Add</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mentor Modify -->
+            <div class="modal fade" id="mentorModify" tabindex="-1" role="dialog" aria-labelledby="mentorModifyLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Mentor Modify</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Mentor Remove -->
+            <div class="modal fade" id="mentorRemove" tabindex="-1" role="dialog" aria-labelledby="mentorRemoveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Mentor Remove</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1>Meetings</h1>
+            <!-- Add Meeting -->
+            <!-- Modify Meeting -->
+            <!-- Remove Meeting -->
+            <!-- Import Meetings from Google CAL/File-->
+            <!-- ID, Meeting Day, Start time, End time, Tyoe (FTC/FRC), Kind (Competition/Outreach/Build/General) -->
+            
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingAdd" id="addMeetingButton">Add Meeting</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingModify" id="modifyMeetingButton">Modify Meeting</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingRemove" id="removeMeetingButton">Remove Meeting</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingImport" id="removeMeetingButton">Import Meetings</button>
+
+            <table class="table table-dark">
+                <thead>
+                    <th scope="col">ID</th>
+                    <th scope="col">Meeting Day</th>
+                    <th scope="col">Start time</th>
+                    <th scope="col">End time</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Kind</th>
+                </thead>
+                <tbody id="meetingsTable">
+                    <!-- Populated by Javascript -->
+               </tbody>
+            </table>
+        
+            <!-- Meeting Modals-->
+            <!-- Meeting Add -->
+            <div class="modal fade" id="meetingAdd" tabindex="-1" role="dialog" aria-labelledby="meetingAddLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Meeting Add</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meeting Modify -->
+            <div class="modal fade" id="meetingModify" tabindex="-1" role="dialog" aria-labelledby="meetingModifyLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Meeting Modify</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Meeting Remove-->
+            <div class="modal fade" id="meetingRemove" tabindex="-1" role="dialog" aria-labelledby="meetingRemoveLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Meeting Remove</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Meeting Import -->
+            <div class="modal fade" id="meetingImport" tabindex="-1" role="dialog" aria-labelledby="meetingImportLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Meeting Import</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            ...
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    </body>
+</html>
