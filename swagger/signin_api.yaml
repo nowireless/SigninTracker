@@ -1,0 +1,189 @@
+swagger: "2.0"
+info:
+  title: "Sign In tracker API"
+  # description: ""
+  version: 1.0.0
+
+# host: api.example.com
+# basePath: /v1
+schemes:
+  - https
+  - http
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+  /students:
+    get:
+      summary: Returns a collection of students
+      description: Collection of students registered in the sign in tracker.
+                   By default only @meta.id's are returned in the colleciton. The
+                   links can be expanded if desired. 
+      parameters:
+      - in: query
+        name: expand  
+        type: boolean
+        default: true
+        description: Expand the links
+      responses:
+        200:
+          description: A array of User objects
+          schema:
+            type: object
+            properties:
+              "@meta.id":
+                $ref: "#/definitions/id"
+              Members:
+                type: array
+                items:
+                  allOf:
+                  - $ref: "#/definitions/idRef"
+                  - $ref: "#/definitions/Student"
+            required:
+              - Members
+              - "@meta.id"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      summary: Create a new student
+      parameters:
+      - in: body
+        name: student
+        schema:
+          $ref: "#/definitions/Student"
+      responses:
+        201:
+          description: Student successfully created
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /students/{id}:
+    get:
+      summary: Get a particular student
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: Student response
+          schema:
+            $ref: "#/definitions/Student"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      summary: Delete the student with the given ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        204:
+          description: Representation of the student that was just deleted.
+          schema:
+            $ref: "#/definitions/Student"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+    patch:
+      summary: Update a particular student
+      parameters:
+      - name: id
+        in: path
+        required: true
+        type: string
+      - in: body
+        name: student
+        schema:
+          $ref: "#/definitions/Student"
+      responses:
+        200:
+          description: Updated student response
+          schema:
+            $ref: "#/definitions/Student"
+        default:
+          description: Unexpected error
+          schema:
+            $ref: "#/definitions/Error"
+
+definitions:
+  Student:
+    type: object
+    properties:
+      "@meta.id":
+        $ref: "#/definitions/id"
+      id:
+        type: string
+        example: abc123
+      schoolId:
+        type: string
+        example: sjost150
+      name:
+        type: object
+        properties:
+          first:
+            type: string
+            example: Ryan
+          last:
+            type: string
+            example: Sjostrand
+        required:
+          - first
+          - last
+      graduationYear:
+        type: integer
+        example: 2015
+    required:
+      - "@meta.id"
+      - name
+      - id
+
+  Error:
+    type: "object"
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+
+  # These meta tags have been influenced after the OData spec
+  # Based/Influenced from: http://redfish.dmtf.org/schemas/v1/odata-v4.yaml
+  count:
+    description: The number of items in a collection.
+    readOnly: true
+    type: integer
+
+  id:
+    description: The unique identifier for a resource.
+    format: uri-reference
+    readOnly: true
+    type: string
+    example: "foo"
+
+  idRef:
+    additionalProperties: false
+    description: A reference to a resource.
+    properties:
+      '@meta.id':
+        $ref: '#/definitions/id'
+    type: object
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /kennedyrobotics/SignIn/1.0.0
