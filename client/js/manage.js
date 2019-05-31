@@ -1,9 +1,16 @@
 "use strict";
 
 
+// Notification Setup
+$(document).ready(function() {
+    $(".toast").toast('show')
+})
+
+
 window.onload = function() {
     console.info("Hello")
 
+    
     $("#studentAddSaveButton").click(function() {
         console.info("Button: Student Add Save")
 
@@ -32,10 +39,23 @@ window.onload = function() {
                 if (postReq.status == 200) {
                     // Success
                     console.info("Requst succedded")
-
+                    $.toast({
+                        title: 'Student Add',
+                        // subtitle: '11 mins ago',
+                        content: 'Request Success',
+                        type: 'success',
+                        delay: 1000
+                    })
                 } else {
                     // Failed
                     console.error("Request failed")
+                    $.toast({
+                        title: 'Student Add',
+                        // subtitle: '11 mins ago',
+                        content: 'Request Failed',
+                        type: 'success',
+                        delay: 1000
+                    })
                 }
             }
         }
