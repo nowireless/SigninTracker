@@ -36,15 +36,17 @@
               
 
         <div class="container-fluid" style="margin-top:80px">
-            <h1>Students</h1>
+            <h1>Manage</h1>
+
+            <h2>Students</h2>
             <!-- Add Student -->
             <!-- Modify Student -->
             <!-- Remove Student -->
             <!-- ID, School ID?, First Name, Last Name, Gradutaiton Year, Grade (Derived)-->
 
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentAdd" id="addStudentButton">Add Student</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentModify" id="modifyStudentButton">Modify Student</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#studentRemove" id="removeStudentButton">Remove Student</button>
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#studentModify" id="modifyStudentButton">Modify Student</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#studentRemove" id="removeStudentButton">Remove Student</button>
 
             <table class="table table-dark">
                 <thead>
@@ -52,7 +54,7 @@
                     <th scope="col">School ID</th>
                     <th scope="col">First Name</th>
                     <th scope="col">Last Name</th>
-                    <th scope="col">Graduation</th>
+                    <th scope="col">Graduation Year</th>
                     <th scope="col">Grade</th>
                 </thead>
                 <tbody id="studentsTable">
@@ -72,11 +74,34 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            ...
+                            
+                            <form>
+                                <div class="form-group">
+                                    <label for="studentAddFirstNameInput">First Name</label>
+                                    <input type="text" class="form-control" id="studentAddFirstNameInput" placeholder="Enter First Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentAddLastNameInput">Last Name</label>
+                                    <input type="text" class="form-control" id="studentAddLastNameInput" placeholder="Enter Last Name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentAddGradutationYearInput">Graduation Year</label>
+                                    <input type="number" class="form-control" id="studentAddGradutationYearInput" placeholder="2020">
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentAddIDInput">ID</label>
+                                    <input type="text" class="form-control" id="studentAddIdInput" placeholder="Enter ID" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="studentAddSchoolIDInput">School ID</label>
+                                    <input type="text" class="form-control" id="studentAddSchoolIdInput" placeholder="Enter School ID">
+                                </div>
+                            </form>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-primary" id="studentAddSaveButton">Save changes</button>
                         </div>
                     </div>
                 </div>
@@ -125,15 +150,15 @@
                 </div>
             </div>
 
-            <h1>Mentors</h1>
+            <h2>Mentors</h2>
             <!-- Add Mentor -->
             <!-- Modify Mentor -->
             <!-- Remove Mentor -->
             <!-- ID, First Name, Last Name -->
 
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorAdd" id="addMentorButton">Add Mentor</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorModify" id="modifyMentorButton">Modify Mentor</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#mentorRemove" id="removeMentorButton">Remove Mentor</button>
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#mentorModify" id="modifyMentorButton">Modify Mentor</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#mentorRemove" id="removeMentorButton">Remove Mentor</button>
 
             <table class="table table-dark">
                 <thead>
@@ -212,17 +237,17 @@
                 </div>
             </div>
 
-            <h1>Meetings</h1>
+            <h2>Meetings</h2>
             <!-- Add Meeting -->
             <!-- Modify Meeting -->
             <!-- Remove Meeting -->
             <!-- Import Meetings from Google CAL/File-->
             <!-- ID, Meeting Day, Start time, End time, Tyoe (FTC/FRC), Kind (Competition/Outreach/Build/General) -->
             
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingImport" id="removeMeetingImport">Import Meetings</button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingAdd" id="addMeetingButton">Add Meeting</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingModify" id="modifyMeetingButton">Modify Meeting</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingRemove" id="removeMeetingButton">Remove Meeting</button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#meetingImport" id="removeMeetingButton">Import Meetings</button>
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#meetingModify" id="modifyMeetingButton">Modify Meeting</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#meetingRemove" id="removeMeetingButton">Remove Meeting</button>
 
             <table class="table table-dark">
                 <thead>
@@ -329,5 +354,6 @@
          <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
          <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
          <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+         <script type="text/javascript" src="js/manage.js"></script>
     </body>
 </html>
