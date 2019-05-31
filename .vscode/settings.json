@@ -1,0 +1,9 @@
+{
+    "go.inferGopath": true,
+    "go.toolsGopath": "C:/Users/nowir/opt/go-tools",
+    "telemetry.enableTelemetry": false,
+
+    "terminal.integrated.env.windows": {
+        "GOPATH":"${workspaceFolder}",
+    }
+}
