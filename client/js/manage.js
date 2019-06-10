@@ -38,7 +38,7 @@ window.onload = function() {
             if(postReq.readyState == 4) {
                 if (postReq.status == 200) {
                     // Success
-                    console.info("Requst succedded")
+                    console.info("Request succeeded")
                     $.toast({
                         title: 'Student Add',
                         // subtitle: '11 mins ago',
@@ -53,7 +53,7 @@ window.onload = function() {
                         title: 'Student Add',
                         // subtitle: '11 mins ago',
                         content: 'Request Failed',
-                        type: 'success',
+                        type: 'error',
                         delay: 1000
                     })
                 }
