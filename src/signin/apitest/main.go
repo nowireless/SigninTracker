@@ -4,12 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"runtime"
 	"signin/database"
 	"strconv"
 	"strings"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/shiena/ansicolor"
 )
 
 type Link struct {
@@ -127,19 +133,42 @@ func main() {
 
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+	// Serve Client files
+	// TODO Make client dir configurable
+	clientDir := "./client"
+	r.PathPrefix("/client/").Handler(http.StripPrefix("/client/", http.FileServer(http.Dir(clientDir))))
+
+	/*
+	 * Middleware Setup
+	 */
+	// Cross-Origin Resource Sharing middleware Setup
+	r.Use(handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PATCH", "DELETE"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+	))
+
+	// Logging
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Info("Request ", r.Method, r.RequestURI, " from ", r.RemoteAddr)
+			next.ServeHTTP(w, r)
+		})
+	})
+
+	r.Handle("/api", timer(func(w http.ResponseWriter, req *http.Request) {
 		result := map[string]interface{}{}
-		result["Teams"] = Link{URI: "/teams"}
-		result["Meetings"] = Link{URI: "/Meetings"}
-		result["People"] = Link{URI: "/people"}
+		result["Teams"] = Link{URI: "/api/teams"}
+		result["Meetings"] = Link{URI: "/api/Meetings"}
+		result["People"] = Link{URI: "/api/people"}
 
 		body, _ := json.MarshalIndent(result, "", "  ")
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	}).Methods("GET")
+	})).Methods("GET")
 
-	r.HandleFunc("/people", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/people", timer(func(w http.ResponseWriter, req *http.Request) {
 		people, err := db.GetAllPeople()
 		if err != nil {
 			panic(err)
@@ -148,7 +177,7 @@ func main() {
 		result := People{}
 		for _, person := range people {
 			result.Members = append(result.Members, Link{
-				URI: fmt.Sprintf("/people/%d", person.PersonID),
+				URI: fmt.Sprintf("/api/people/%d", person.PersonID),
 			})
 		}
 
@@ -156,9 +185,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	}).Methods("GET")
+	})).Methods("GET")
 
-	r.HandleFunc("/people/{id}", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/people/{id}", timer(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		personIDRaw := vars["id"]
 		personID, err := strconv.ParseInt(personIDRaw, 10, 64)
@@ -195,7 +224,7 @@ func main() {
 		}
 		for _, team := range teams {
 			link := Link{}
-			link.URI = fmt.Sprintf("/teams/%d", team.TeamID)
+			link.URI = fmt.Sprintf("/api/teams/%d", team.TeamID)
 			result.MentorOf = append(result.MentorOf, link)
 		}
 
@@ -205,7 +234,7 @@ func main() {
 		}
 		for _, team := range teams {
 			link := Link{}
-			link.URI = fmt.Sprintf("/teams/%d", team.TeamID)
+			link.URI = fmt.Sprintf("/api/teams/%d", team.TeamID)
 			result.StudentOf = append(result.StudentOf, link)
 		}
 
@@ -215,7 +244,7 @@ func main() {
 		}
 		for _, child := range children {
 			link := Link{}
-			link.URI = fmt.Sprintf("/person/%d", child.PersonID)
+			link.URI = fmt.Sprintf("/api/person/%d", child.PersonID)
 			result.ParentOf = append(result.ParentOf, link)
 		}
 
@@ -227,7 +256,7 @@ func main() {
 			relation := ParentRelation{}
 			relation.Relation = parent.Relation
 			relation.Link = Link{}
-			relation.Link.URI = fmt.Sprintf("/person/%d", parent.Parent.PersonID)
+			relation.Link.URI = fmt.Sprintf("/api/person/%d", parent.Parent.PersonID)
 			result.Parents = append(result.Parents, relation)
 		}
 
@@ -235,9 +264,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	}).Methods("GET")
+	})).Methods("GET")
 
-	r.HandleFunc("/teams", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/teams", timer(func(w http.ResponseWriter, req *http.Request) {
 		teams, err := db.GetAllTeams()
 		if err != nil {
 			panic(err)
@@ -246,7 +275,7 @@ func main() {
 		result := People{}
 		for _, team := range teams {
 			result.Members = append(result.Members, Link{
-				URI: fmt.Sprintf("/teams/%d", team.TeamID),
+				URI: fmt.Sprintf("/api/teams/%d", team.TeamID),
 			})
 		}
 
@@ -254,9 +283,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	}).Methods("GET")
+	})).Methods("GET")
 
-	r.HandleFunc("/teams/{id}", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/teams/{id}", timer(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		teamIdRaw := vars["id"]
 		teamId, err := strconv.ParseInt(teamIdRaw, 10, 64)
@@ -281,7 +310,7 @@ func main() {
 		}
 		for _, student := range students {
 			link := Link{}
-			link.URI = fmt.Sprintf("/people/%d", student.PersonID)
+			link.URI = fmt.Sprintf("/api/people/%d", student.PersonID)
 			result.Students = append(result.Students, link)
 		}
 
@@ -291,7 +320,7 @@ func main() {
 		}
 		for _, mentor := range mentors {
 			link := Link{}
-			link.URI = fmt.Sprintf("/people/%d", mentor.PersonID)
+			link.URI = fmt.Sprintf("/api/people/%d", mentor.PersonID)
 			result.Mentors = append(result.Mentors, link)
 		}
 
@@ -299,9 +328,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	}).Methods("GET")
+	})).Methods("GET")
 
-	r.HandleFunc("/meetings", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/meetings", timer(func(w http.ResponseWriter, req *http.Request) {
 		meetings, err := db.GetAllMeetings()
 		if err != nil {
 			panic(err)
@@ -310,7 +339,7 @@ func main() {
 		result := Meetings{}
 		for _, meeting := range meetings {
 			result.Members = append(result.Members, Link{
-				URI: fmt.Sprintf("/meetings/%d", meeting.MeetingID),
+				URI: fmt.Sprintf("/api/meetings/%d", meeting.MeetingID),
 			})
 		}
 
@@ -318,9 +347,9 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	})
+	})).Methods("GET")
 
-	r.HandleFunc("/meetings/{id}", func(w http.ResponseWriter, req *http.Request) {
+	r.Handle("/api/meetings/{id}", timer(func(w http.ResponseWriter, req *http.Request) {
 		vars := mux.Vars(req)
 		meetingIDRaw := vars["id"]
 		meetingID, err := strconv.ParseInt(meetingIDRaw, 10, 64)
@@ -385,7 +414,7 @@ func main() {
 		}
 		for _, team := range teams {
 			link := Link{}
-			link.URI = fmt.Sprintf("/teams/%d", team.TeamID)
+			link.URI = fmt.Sprintf("/api/teams/%d", team.TeamID)
 			result.Teams = append(result.Teams, link)
 		}
 
@@ -395,7 +424,7 @@ func main() {
 		}
 		for _, person := range committed {
 			link := Link{}
-			link.URI = fmt.Sprintf("/people/%d", person.PersonID)
+			link.URI = fmt.Sprintf("/api/people/%d", person.PersonID)
 			result.Committed = append(result.Committed, link)
 		}
 
@@ -406,7 +435,7 @@ func main() {
 		for _, signIn := range signedIn {
 			s := SignIn{}
 			s.InTime = signIn.InTime
-			s.Person.URI = fmt.Sprintf("/people/%d", signIn.PersonID)
+			s.Person.URI = fmt.Sprintf("/api/people/%d", signIn.PersonID)
 			result.SignedIn = append(result.SignedIn, s)
 		}
 
@@ -417,7 +446,7 @@ func main() {
 		for _, signOut := range signedOut {
 			s := SignOut{}
 			s.OutTime = signOut.OutTime
-			s.Person.URI = fmt.Sprintf("/people/%d", signOut.PersonID)
+			s.Person.URI = fmt.Sprintf("/api/people/%d", signOut.PersonID)
 			result.SignedOut = append(result.SignedOut, s)
 		}
 
@@ -425,8 +454,18 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(200)
 		w.Write(body)
-	})
+	})).Methods("GET")
 
 	log.Info("Listening on :8081")
 	http.ListenAndServe(":8081", r)
+}
+
+func timer(f http.HandlerFunc) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+		http.HandlerFunc(f).ServeHTTP(w, r)
+		duration := time.Now().Sub(startTime)
+
+		log.Info("Request ", r.Method, r.RequestURI, " from ", r.RemoteAddr, " took ", duration)
+	})
 }
