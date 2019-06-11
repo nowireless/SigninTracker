@@ -3,6 +3,8 @@ package database
 import (
 	"fmt"
 
+	log "github.com/sirupsen/logrus"
+
 	_ "github.com/jackc/pgx/stdlib"
 	"github.com/jmoiron/sqlx"
 )
@@ -26,14 +28,14 @@ func Connect(config Config) (*Database, error) {
 		config.Database,
 	)
 
-	fmt.Println("Connection String: ", connectionStr)
+	log.Info("Connection String: ", connectionStr)
 
 	db, err := sqlx.Connect("pgx", connectionStr)
 	if err != nil {
 		return nil, err
 	}
 
-	fmt.Println("Pinging Database")
+	log.Info("Pinging Database")
 	db.Ping()
 
 	return &Database{DB: db}, nil

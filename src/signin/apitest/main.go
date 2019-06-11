@@ -7,6 +7,7 @@ import (
 	"signin/database"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -104,6 +105,12 @@ type Meeting struct {
 }
 
 func main() {
+	if runtime.GOOS == "windows" {
+		// Setup logging for windows
+		log.SetFormatter(&log.TextFormatter{ForceColors: true})
+		log.SetOutput(ansicolor.NewAnsiColorWriter(os.Stdout))
+	}
+
 	config := database.Config{
 		User:     "signin",
 		Password: "foobar",
@@ -420,6 +427,6 @@ func main() {
 		w.Write(body)
 	})
 
-	fmt.Println("Listening on :8081")
+	log.Info("Listening on :8081")
 	http.ListenAndServe(":8081", r)
 }
