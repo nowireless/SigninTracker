@@ -1,125 +1,12 @@
-package main
+package database
 
 import (
 	"database/sql"
-
-	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 // TODO: Need to decide what errors should cause an panic?
 // TODO: Consider using Gorm?
-
-type Database struct {
-	DB *sqlx.DB
-}
-
-func (*Database) String() string {
-	// TODO: This is a hack to stop spew from dumping the contents of database connection
-	return ""
-}
-
-func (db *Database) GetPerson(id int) (*Person, error) {
-	tx := db.DB.MustBegin()
-	defer tx.Commit()
-
-	return db.GetPersonTX(tx, id)
-}
-
-func (db *Database) GetPersonTX(tx *sqlx.Tx, id int) (*Person, error) {
-	// SELECT personid, checkinid, firstname, lastname, email, phone, schoolemail, schoolid
-	// FROM people
-	// WHERE personid = 0;
-
-	stmt, err := tx.Preparex(`
-		SELECT personid, checkinid, firstname, lastname, email, phone, schoolemail, schoolid
-		FROM people
-		WHERE personid = $1;
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	row := stmt.QueryRowx(id)
-	if row.Err() != nil {
-		return nil, err
-	}
-
-	person := Person{db: db}
-	err = row.StructScan(&person)
-	if err != nil {
-		return nil, err
-	}
-
-	return &person, nil
-}
-
-func (db *Database) GetMeeting(id int) (*Meeting, error) {
-	tx := db.DB.MustBegin()
-	defer tx.Commit()
-	return db.GetMeetingTx(tx, id)
-}
-
-func (db *Database) GetMeetingTx(tx *sqlx.Tx, id int) (*Meeting, error) {
-	stmt, err := tx.Preparex(`
-		SELECT meetingid, date, starttime, endtime, location
-		FROM meetings
-		WHERE meetingid = $1;
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	row := stmt.QueryRowx(id)
-	if row.Err() != nil {
-		return nil, err
-	}
-
-	meeting := Meeting{db: db}
-	err = row.StructScan(&meeting)
-	if err != nil {
-		return nil, err
-	}
-
-	return &meeting, nil
-}
-
-func (db *Database) GetTeam(id int) (*Team, error) {
-	tx := db.DB.MustBegin()
-	defer tx.Commit()
-	return db.GetTeamTx(tx, id)
-}
-
-func (db *Database) GetTeamTx(tx *sqlx.Tx, id int) (*Team, error) {
-	stmt, err := db.DB.Preparex(`
-	SELECT
-		teamid,
-		compeition,
-		number,
-		name
-	FROM teams
-	WHERE teamid = $1
-	`)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	row := stmt.QueryRowx(id)
-	if row.Err() != nil {
-		return nil, err
-	}
-
-	team := Team{db: db}
-	err = row.StructScan(&team)
-	if err != nil {
-		return nil, err
-	}
-
-	return &team, nil
-
-}
 
 type Person struct {
 	db        *Database
@@ -324,10 +211,10 @@ type Meeting struct {
 	db        *Database
 	MeetingID int //`db:"MeetingID"`
 
-	Date      string //`db:"Date"`      // TODO use go type
-	StartTime string //`db:"StartTime"` // TODO use go type
-	EndTime   string //`db:"EndTime"`   // TODO use go type
-	Location  string //`db:"Location"`  // TODO use go type
+	Date      time.Time //`db:"Date"`      // TODO use go type
+	StartTime string    //`db:"StartTime"` // TODO use go type
+	EndTime   string    //`db:"EndTime"`   // TODO use go type
+	Location  string    //`db:"Location"`  // TODO use go type
 }
 
 func (m *Meeting) Teams() ([]Team, error) {
@@ -366,7 +253,7 @@ func (m *Meeting) Teams() ([]Team, error) {
 	return teams, nil
 }
 
-func (m *Meeting) Commited() ([]Person, error) {
+func (m *Meeting) Committed() ([]Person, error) {
 	stmt, err := m.db.DB.Preparex(`	
 		SELECT
 			person.personid,

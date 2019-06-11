@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"signin/database"
 
 	"github.com/davecgh/go-spew/spew"
 
@@ -46,7 +47,7 @@ func main() {
 	fmt.Println("Pinging Database")
 	db.Ping()
 
-	database := &Database{DB: db}
+	database := &database.Database{DB: db}
 
 	p, err := database.GetPerson(0)
 	if err != nil {
