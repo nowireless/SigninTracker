@@ -4,8 +4,8 @@ info:
   # description: ""
   version: 1.0.0
 
-# host: api.example.com
-# basePath: /v1
+host: api.example.com
+basePath: /v1
 schemes:
   # - https
   - http
@@ -17,14 +17,14 @@ produces:
   - application/json
 
 paths:
-  /students:
+  /people:
     get:
-      summary: Returns a collection of students
-      description: Collection of students registered in the sign in tracker.
+      summary: Returns a collection of people
+      description: Collection of people registered in the sign in tracker.
                    By default only @meta.id's are returned in the colleciton. The
                    links can be expanded if desired. 
       tags:
-        - Students
+        - People
       parameters:
       - in: query
         name: expand  
@@ -44,7 +44,7 @@ paths:
                 items:
                   allOf:
                   - $ref: "#/definitions/idRef"
-                  - $ref: "#/definitions/Student"
+                  - $ref: "#/definitions/Person"
             required:
               - Members
               - "@meta.id"
@@ -53,27 +53,27 @@ paths:
           schema:
             $ref: "#/definitions/Error"
     post:
-      summary: Create a new student
+      summary: Create a new Person
       tags:
-        - Students
+        - People
       parameters:
       - in: body
-        name: student
+        name: person
         schema:
-          $ref: "#/definitions/Student"
+          $ref: "#/definitions/Person"
       responses:
         201:
-          description: Student successfully created
+          description: Person successfully created
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
 
-  /students/{id}:
+  /people/{id}:
     get:
-      summary: Get a particular student
+      summary: Get a particular person
       tags:
-        - Students
+        - People
       parameters:
         - name: id
           in: path
@@ -81,17 +81,17 @@ paths:
           type: string
       responses:
         200:
-          description: Student response
+          description: Person response
           schema:
-            $ref: "#/definitions/Student"
+            $ref: "#/definitions/Person"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
     delete:
-      summary: Delete the student with the given ID
+      summary: Delete the person with the given ID
       tags:
-        - Students
+        - People
       parameters:
         - name: id
           in: path
@@ -99,17 +99,17 @@ paths:
           type: string
       responses:
         204:
-          description: Representation of the student that was just deleted.
+          description: Representation of the person that was just deleted.
           schema:
-            $ref: "#/definitions/Student"
+            $ref: "#/definitions/Person"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
     patch:
-      summary: Update a particular student
+      summary: Update a particular peson
       tags:
-        - Students
+        - People
       parameters:
       - name: id
         in: path
@@ -118,25 +118,25 @@ paths:
       - in: body
         name: student
         schema:
-          $ref: "#/definitions/Student"
+          $ref: "#/definitions/Person"
       responses:
         200:
           description: Updated student response
           schema:
-            $ref: "#/definitions/Student"
+            $ref: "#/definitions/Person"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
 
-  /mentors:
+  /teams:
     get:
-      summary: Returns a collection of mentors
-      description: Collection of mentors registered in the sign in tracker.
+      summary: Returns a collection of teams
+      description: Collection of teams registered in the sign in tracker.
                    By default only @meta.id's are returned in the colleciton. The
                    links can be expanded if desired. 
       tags:
-        - Mentors
+        - Teams
       parameters:
       - in: query
         name: expand  
@@ -145,7 +145,7 @@ paths:
         description: Expand the links
       responses:
         200:
-          description: A array of mentor objects
+          description: A array of team objects
           schema:
             type: object
             properties:
@@ -156,7 +156,7 @@ paths:
                 items:
                   allOf:
                   - $ref: "#/definitions/idRef"
-                  - $ref: "#/definitions/Mentor"
+                  - $ref: "#/definitions/Team"
             required:
               - Members
               - "@meta.id"
@@ -165,28 +165,28 @@ paths:
           schema:
             $ref: "#/definitions/Error"
     post:
-      summary: Create a new mentor
+      summary: Create a new team
       tags:
-        - Mentors
+        - Teams
 
       parameters:
       - in: body
         name: mentor
         schema:
-          $ref: "#/definitions/Mentor"
+          $ref: "#/definitions/Team"
       responses:
         201:
-          description: Mentor successfully created
+          description: Team successfully created
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
 
-  /mentors/{id}:
+  /teams/{id}:
     get:
-      summary: Get a particular mentor
+      summary: Get a particular team
       tags:
-        - Mentors
+        - Teams
 
       parameters:
         - name: id
@@ -195,17 +195,17 @@ paths:
           type: string
       responses:
         200:
-          description: Mentor response
+          description: Team response
           schema:
-            $ref: "#/definitions/Mentor"
+            $ref: "#/definitions/Team"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
     delete:
-      summary: Delete the mentor with the given ID
+      summary: Delete the Team with the given ID
       tags:
-        - Mentors
+        - Teams
 
       parameters:
         - name: id
@@ -214,17 +214,17 @@ paths:
           type: string
       responses:
         204:
-          description: Representation of the mentor that was just deleted.
+          description: Representation of the Team that was just deleted.
           schema:
-            $ref: "#/definitions/Mentor"
+            $ref: "#/definitions/Team"
         default:
           description: Unexpected error
           schema:
             $ref: "#/definitions/Error"
     patch:
-      summary: Update a particular mentor
+      summary: Update a particular Team
       tags:
-        - Mentors
+        - Teams
       parameters:
       - name: id
         in: path
@@ -233,13 +233,13 @@ paths:
       - in: body
         name: mentor
         schema:
-          $ref: "#/definitions/Mentor"
+          $ref: "#/definitions/Team"
           
       responses:
         200:
-          description: Updated mentor response
+          description: Updated Team response
           schema:
-            $ref: "#/definitions/Mentor"
+            $ref: "#/definitions/Team"
         default:
           description: Unexpected error
           schema:
@@ -259,6 +259,25 @@ paths:
         type: boolean
         default: true
         description: Expand the links
+      - in: query
+        name: beforeDate
+        type: string
+        format: date
+        description: Meetings before this date
+      - in: query
+        name: afterDate
+        type: string
+        format: date 
+        description: Meetings after this date
+      - in: query
+        name: teamid
+        type: integer
+        description: Limit meetings to a specific team. Use database ID
+        # TODO support multiple teams at once
+          # anyOf:
+          #   - type: integer
+          #   # - type: array
+          #     # items: integer
       responses:
         200:
           description: A array of meeting objects
@@ -360,22 +379,14 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-  /meetings/{id}/committed:
-    # List of Students or mentors who committed to showing up
-
-
 definitions:
-  Student:
+  Person:
     type: object
     properties:
       # "@meta.id":
       #   $ref: "#/definitions/id"
-      id:
-        type: string
-        example: abc123
-      schoolId:
-        type: string
-        example: sjost150
+      PersonId:
+        type: integer
       name:
         type: object
         properties:
@@ -388,38 +399,77 @@ definitions:
         required:
           - first
           - last
-      graduationYear:
-        type: integer
-        example: 2015
+      checkinid:
+        type: string
+      student:
+        type: object
+        properties:
+          schoolId:
+            type: string
+            example: sjost150
+          schoolEmail:
+            type: string
+            format: email
+          graduationYear:
+            type: integer
+            example: 2015
+          teams:
+            type: array
+            items:
+              $ref: "#/definitions/idRef"
+      mentor:
+        type: object
+        properties:
+          teams:
+            type: array
+            items:
+              $ref: "#/definitions/idRef"
+      parents:
+        type: object
+        properties:
+          teams:
+            type: array
+            items:
+              $ref: "#/definitions/idRef"
+      parentOf:
+        type: array
+        items:
+          type: object
+          properties:
+            relation:
+              type: string
+              enum: ["Father", "Mother", "Guardian"]
+            student:
+              $ref: "#/definitions/idRef"
     required:
       # - "@meta.id"
       - name
       - id
 
-  Mentor:
-    type: object
-    properties:
-      # "@meta.id":
-      #   $ref: "#/definitions/id"
-      id:
-        type: string
-        example: abc123
-      name:
-        type: object
-        properties:
-          first:
-            type: string
-            example: Ryan
-          last:
-            type: string
-            example: Sjostrand
-        required:
-          - first
-          - last
-    required:
-      # - "@meta.id"
-      - name
-      - id
+  # Mentor:
+  #   type: object
+  #   properties:
+  #     # "@meta.id":
+  #     #   $ref: "#/definitions/id"
+  #     id:
+  #       type: string
+  #       example: abc123
+  #     name:
+  #       type: object
+  #       properties:
+  #         first:
+  #           type: string
+  #           example: Ryan
+  #         last:
+  #           type: string
+  #           example: Sjostrand
+  #       required:
+  #         - first
+  #         - last
+  #   required:
+  #     # - "@meta.id"
+  #     - name
+  #     - id
 
   Meeting:
     type: object
@@ -430,9 +480,58 @@ definitions:
         type: string
         format: date
       StartTime:
-        $ref: "#/definitions/Time"
+        type: string
+        description: Start time of meeting. Using 24 hour time format. HH:MM:SS 
+        pattern: (?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)
       EndTime:
-        $ref: "#/definitions/Time"
+        type: string
+        description: End time of meeting. Using 24 hour time format. HH:MM:SS 
+        pattern: (?:[01]\d|2[0-3]):(?:[0-5]\d):(?:[0-5]\d)
+
+      Teams:
+        type: array
+        items:
+          $ref: "#/definitions/idRef"
+
+      Committed:
+        type: array
+        items: 
+          $ref: "#/definitions/idRef"
+      SignedIn:
+        type: array
+        items: 
+          $ref: "#/definitions/idRef"
+      SignedOut:
+        type: array
+        items: 
+           $ref: "#/definitions/idRef"
+
+  Team:
+    type: object
+    properties:
+      Competition:
+        type: string
+        enum: ["FRC", "FTC", "FLL", "FLLjr"]
+        example: FRC
+      Number:
+        type: integer
+        example: 3081
+      Name: 
+        type: string
+        example: RoboEagles
+
+      Students:
+        type: array
+        items: 
+          $ref: "#/definitions/idRef"
+      Mentors:
+        type: array
+        items: 
+          $ref: "#/definitions/idRef"
+      Meetings:
+        type: array
+        items: 
+          $ref: "#/definitions/idRef"
 
   Day:
     type: object
@@ -504,6 +603,3 @@ definitions:
       '@meta.id':
         $ref: '#/definitions/id'
     type: object
-# Added by API Auto Mocking Plugin
-host: virtserver.swaggerhub.com
-basePath: /signin/1.0
