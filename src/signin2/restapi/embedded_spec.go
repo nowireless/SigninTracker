@@ -87,14 +87,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Meeting"
-                      }
-                    ]
+                    "$ref": "#/definitions/Meeting"
                   }
                 }
               }
@@ -260,14 +253,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Person"
-                      }
-                    ]
+                    "$ref": "#/definitions/Person"
                   }
                 }
               }
@@ -433,14 +419,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Team"
-                      }
-                    ]
+                    "$ref": "#/definitions/Team"
                   }
                 }
               }
@@ -613,6 +592,11 @@ func init() {
     "Meeting": {
       "type": "object",
       "properties": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": false
+        },
         "Committed": {
           "type": "array",
           "items": {
@@ -650,45 +634,43 @@ func init() {
           "items": {
             "$ref": "#/definitions/idRef"
           }
-        },
-        "id": {
-          "type": "string"
         }
       }
     },
     "Person": {
       "type": "object",
       "properties": {
-        "PersonId": {
-          "type": "integer"
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": true
         },
         "checkinid": {
-          "type": "string"
+          "type": "string",
+          "x-isnullable": true
         },
-        "mentor": {
-          "type": "object",
-          "properties": {
-            "teams": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/idRef"
-              }
-            }
+        "email": {
+          "type": "string",
+          "format": "email",
+          "x-isnullable": true
+        },
+        "mentorOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/idRef"
           }
         },
         "name": {
           "type": "object",
-          "required": [
-            "first",
-            "last"
-          ],
           "properties": {
             "first": {
               "type": "string",
+              "x-isnullable": true,
               "example": "Ryan"
             },
             "last": {
               "type": "string",
+              "x-isnullable": true,
               "example": "Sjostrand"
             }
           }
@@ -713,29 +695,31 @@ func init() {
           }
         },
         "parents": {
-          "type": "object",
-          "properties": {
-            "teams": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/idRef"
-              }
-            }
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/idRef"
           }
+        },
+        "phone": {
+          "type": "string",
+          "x-isnullable": true
         },
         "student": {
           "type": "object",
           "properties": {
             "graduationYear": {
               "type": "integer",
+              "x-isnullable": true,
               "example": 2015
             },
             "schoolEmail": {
               "type": "string",
-              "format": "email"
+              "format": "email",
+              "x-isnullable": true
             },
             "schoolId": {
               "type": "string",
+              "x-isnullable": true,
               "example": "sjost150"
             },
             "teams": {
@@ -751,6 +735,11 @@ func init() {
     "Team": {
       "type": "object",
       "properties": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": false
+        },
         "Competition": {
           "type": "string",
           "enum": [
@@ -822,7 +811,16 @@ func init() {
       "description": "A reference to a resource.",
       "type": "object",
       "properties": {
-        "@meta.id": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID"
+        },
+        "@meta.collection": {
+          "x-go-name": "CollectionURI",
+          "$ref": "#/definitions/id"
+        },
+        "@meta.uri": {
+          "x-go-name": "MetaURI",
           "$ref": "#/definitions/id"
         }
       },
@@ -900,14 +898,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Meeting"
-                      }
-                    ]
+                    "$ref": "#/definitions/Meeting"
                   }
                 }
               }
@@ -1073,14 +1064,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Person"
-                      }
-                    ]
+                    "$ref": "#/definitions/Person"
                   }
                 }
               }
@@ -1246,14 +1230,7 @@ func init() {
                 "Members": {
                   "type": "array",
                   "items": {
-                    "allOf": [
-                      {
-                        "$ref": "#/definitions/idRef"
-                      },
-                      {
-                        "$ref": "#/definitions/Team"
-                      }
-                    ]
+                    "$ref": "#/definitions/Team"
                   }
                 }
               }
@@ -1426,6 +1403,11 @@ func init() {
     "Meeting": {
       "type": "object",
       "properties": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": false
+        },
         "Committed": {
           "type": "array",
           "items": {
@@ -1463,45 +1445,43 @@ func init() {
           "items": {
             "$ref": "#/definitions/idRef"
           }
-        },
-        "id": {
-          "type": "string"
         }
       }
     },
     "Person": {
       "type": "object",
       "properties": {
-        "PersonId": {
-          "type": "integer"
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": true
         },
         "checkinid": {
-          "type": "string"
+          "type": "string",
+          "x-isnullable": true
         },
-        "mentor": {
-          "type": "object",
-          "properties": {
-            "teams": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/idRef"
-              }
-            }
+        "email": {
+          "type": "string",
+          "format": "email",
+          "x-isnullable": true
+        },
+        "mentorOf": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/idRef"
           }
         },
         "name": {
           "type": "object",
-          "required": [
-            "first",
-            "last"
-          ],
           "properties": {
             "first": {
               "type": "string",
+              "x-isnullable": true,
               "example": "Ryan"
             },
             "last": {
               "type": "string",
+              "x-isnullable": true,
               "example": "Sjostrand"
             }
           }
@@ -1526,29 +1506,31 @@ func init() {
           }
         },
         "parents": {
-          "type": "object",
-          "properties": {
-            "teams": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/idRef"
-              }
-            }
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/idRef"
           }
+        },
+        "phone": {
+          "type": "string",
+          "x-isnullable": true
         },
         "student": {
           "type": "object",
           "properties": {
             "graduationYear": {
               "type": "integer",
+              "x-isnullable": true,
               "example": 2015
             },
             "schoolEmail": {
               "type": "string",
-              "format": "email"
+              "format": "email",
+              "x-isnullable": true
             },
             "schoolId": {
               "type": "string",
+              "x-isnullable": true,
               "example": "sjost150"
             },
             "teams": {
@@ -1564,6 +1546,11 @@ func init() {
     "Team": {
       "type": "object",
       "properties": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID",
+          "x-isnullable": false
+        },
         "Competition": {
           "type": "string",
           "enum": [
@@ -1637,7 +1624,16 @@ func init() {
       "description": "A reference to a resource.",
       "type": "object",
       "properties": {
-        "@meta.id": {
+        "@database.id": {
+          "type": "integer",
+          "x-go-name": "DatabaseID"
+        },
+        "@meta.collection": {
+          "x-go-name": "CollectionURI",
+          "$ref": "#/definitions/id"
+        },
+        "@meta.uri": {
+          "x-go-name": "MetaURI",
           "$ref": "#/definitions/id"
         }
       },

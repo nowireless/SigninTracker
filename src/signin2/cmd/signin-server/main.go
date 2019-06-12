@@ -23,7 +23,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	api := operations.NewSignInTrackerAPI(swaggerSpec)
+	api := operations.NewSigninAPI(swaggerSpec)
 	server := restapi.NewServer(api)
 	defer server.Shutdown()
 

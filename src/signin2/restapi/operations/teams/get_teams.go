@@ -76,7 +76,7 @@ type GetTeamsOKBody struct {
 
 	// members
 	// Required: true
-	Members []*MembersItems0 `json:"Members"`
+	Members []*models.Team `json:"Members"`
 }
 
 // Validate validates this get teams o k body
@@ -145,89 +145,6 @@ func (o *GetTeamsOKBody) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (o *GetTeamsOKBody) UnmarshalBinary(b []byte) error {
 	var res GetTeamsOKBody
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*o = res
-	return nil
-}
-
-// MembersItems0 members items0
-// swagger:model MembersItems0
-type MembersItems0 struct {
-	models.IDRef
-
-	models.Team
-}
-
-// UnmarshalJSON unmarshals this object from a JSON structure
-func (o *MembersItems0) UnmarshalJSON(raw []byte) error {
-	// AO0
-	var aO0 models.IDRef
-	if err := swag.ReadJSON(raw, &aO0); err != nil {
-		return err
-	}
-	o.IDRef = aO0
-
-	// AO1
-	var aO1 models.Team
-	if err := swag.ReadJSON(raw, &aO1); err != nil {
-		return err
-	}
-	o.Team = aO1
-
-	return nil
-}
-
-// MarshalJSON marshals this object to a JSON structure
-func (o MembersItems0) MarshalJSON() ([]byte, error) {
-	_parts := make([][]byte, 0, 2)
-
-	aO0, err := swag.WriteJSON(o.IDRef)
-	if err != nil {
-		return nil, err
-	}
-	_parts = append(_parts, aO0)
-
-	aO1, err := swag.WriteJSON(o.Team)
-	if err != nil {
-		return nil, err
-	}
-	_parts = append(_parts, aO1)
-
-	return swag.ConcatJSON(_parts...), nil
-}
-
-// Validate validates this members items0
-func (o *MembersItems0) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	// validation for a type composition with models.IDRef
-	if err := o.IDRef.Validate(formats); err != nil {
-		res = append(res, err)
-	}
-	// validation for a type composition with models.Team
-	if err := o.Team.Validate(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (o *MembersItems0) MarshalBinary() ([]byte, error) {
-	if o == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(o)
-}
-
-// UnmarshalBinary interface implementation
-func (o *MembersItems0) UnmarshalBinary(b []byte) error {
-	var res MembersItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

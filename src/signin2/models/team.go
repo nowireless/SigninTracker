@@ -24,6 +24,9 @@ type Team struct {
 	// Enum: [FRC FTC FLL FLLjr]
 	Competition string `json:"Competition,omitempty"`
 
+	// database ID
+	DatabaseID int64 `json:"@database.id,omitempty"`
+
 	// meetings
 	Meetings []*IDRef `json:"Meetings"`
 

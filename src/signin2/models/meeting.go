@@ -22,6 +22,9 @@ type Meeting struct {
 	// committed
 	Committed []*IDRef `json:"Committed"`
 
+	// database ID
+	DatabaseID int64 `json:"@database.id,omitempty"`
+
 	// day
 	// Format: date
 	Day strfmt.Date `json:"Day,omitempty"`
@@ -42,9 +45,6 @@ type Meeting struct {
 
 	// teams
 	Teams []*IDRef `json:"Teams"`
-
-	// id
-	ID string `json:"id,omitempty"`
 }
 
 // Validate validates this meeting

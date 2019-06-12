@@ -26,6 +26,14 @@
   version = "v9"
 
 [[projects]]
+  digest = "1:ffe9824d294da03b391f44e1ae8281281b4afc1bdaa9588c9097785e3af10cec"
+  name = "github.com/davecgh/go-spew"
+  packages = ["spew"]
+  pruneopts = "UT"
+  revision = "8991bc29aa16c548c550c7ff78260e27b9ab7c73"
+  version = "v1.1.1"
+
+[[projects]]
   digest = "1:e95ef557dc3120984bb66b385ae01b4bb8ff56bcde28e7b0d1beed0cccc4d69f"
   name = "github.com/docker/go-units"
   packages = ["."]
@@ -137,12 +145,47 @@
   version = "v0.19.0"
 
 [[projects]]
+  digest = "1:d6efaec4c4a8b7009b1a6afe98534a2322b5be0c200a7f733f1def4a1a261b94"
+  name = "github.com/jackc/pgx"
+  packages = [
+    ".",
+    "chunkreader",
+    "internal/sanitize",
+    "pgio",
+    "pgproto3",
+    "pgtype",
+    "stdlib",
+  ]
+  pruneopts = "UT"
+  revision = "8faa4453fc7051d1076053f8854077753ab912f2"
+  version = "v3.4.0"
+
+[[projects]]
   digest = "1:a2cff208d4759f6ba1b1cd228587b0a1869f95f22542ec9cd17fff64430113c7"
   name = "github.com/jessevdk/go-flags"
   packages = ["."]
   pruneopts = "UT"
   revision = "c6ca198ec95c841fdb89fc0de7496fed11ab854e"
   version = "v1.4.0"
+
+[[projects]]
+  digest = "1:6c41d4f998a03b6604227ccad36edaed6126c397e5d78709ef4814a1145a6757"
+  name = "github.com/jmoiron/sqlx"
+  packages = [
+    ".",
+    "reflectx",
+  ]
+  pruneopts = "UT"
+  revision = "d161d7a76b5661016ad0b085869f77fd410f3e6a"
+  version = "v1.2.0"
+
+[[projects]]
+  digest = "1:31e761d97c76151dde79e9d28964a812c46efc5baee4085b86f68f0c654450de"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
@@ -165,6 +208,30 @@
   version = "v1.1.2"
 
 [[projects]]
+  digest = "1:cf31692c14422fa27c83a05292eb5cbe0fb2775972e8f1f8446a71549bd8980b"
+  name = "github.com/pkg/errors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
+  version = "v0.8.1"
+
+[[projects]]
+  digest = "1:04457f9f6f3ffc5fea48e71d62f2ca256637dee0a04d710288e27e05c8b41976"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "839c75faf7f98a33d445d181f3018b5c3409a45e"
+  version = "v1.4.2"
+
+[[projects]]
+  branch = "master"
+  digest = "1:f92f6956e4059f6a3efc14924d2dd58ba90da25cc57fe07ae3779ef2f5e0c5f2"
+  name = "golang.org/x/crypto"
+  packages = ["pbkdf2"]
+  pruneopts = "UT"
+  revision = "5c40567a22f818bd14a1ea7245dad9f8ef0691aa"
+
+[[projects]]
   branch = "master"
   digest = "1:e654f02d20744fab9887e57ff63c7277a124122f3960a351f54bfd7edd04f536"
   name = "golang.org/x/net"
@@ -176,11 +243,21 @@
   revision = "3f473d35a33aa6fdd203e306dc439b797820e3f1"
 
 [[projects]]
-  digest = "1:66a2f252a58b4fbbad0e4e180e1d85a83c222b6bce09c3dcdef3dc87c72eda7c"
+  branch = "master"
+  digest = "1:010311506e3917b54487c35a4277e2709678a40c1587d82492c40b78b6a0a01d"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
+  pruneopts = "UT"
+  revision = "93c9922d18aeb82498a065f07aec7ad7fa60dfb7"
+
+[[projects]]
+  digest = "1:5f1559c4cee44069f81517430ebba19589869f3d4d4648213a4d5ddd199b11d8"
   name = "golang.org/x/text"
   packages = [
+    "cases",
     "collate",
     "collate/build",
+    "internal",
     "internal/colltab",
     "internal/gen",
     "internal/language",
@@ -189,7 +266,9 @@
     "internal/triegen",
     "internal/ucd",
     "language",
+    "runes",
     "secure/bidirule",
+    "secure/precis",
     "transform",
     "unicode/bidi",
     "unicode/cldr",
@@ -213,6 +292,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/davecgh/go-spew/spew",
     "github.com/go-openapi/errors",
     "github.com/go-openapi/loads",
     "github.com/go-openapi/runtime",
@@ -223,7 +303,10 @@
     "github.com/go-openapi/strfmt",
     "github.com/go-openapi/swag",
     "github.com/go-openapi/validate",
+    "github.com/jackc/pgx/stdlib",
     "github.com/jessevdk/go-flags",
+    "github.com/jmoiron/sqlx",
+    "github.com/sirupsen/logrus",
     "golang.org/x/net/netutil",
   ]
   solver-name = "gps-cdcl"

@@ -16,15 +16,25 @@ import (
 // swagger:model idRef
 type IDRef struct {
 
-	// at meta id
-	AtMetaID ID `json:"@meta.id,omitempty"`
+	// collection URI
+	CollectionURI ID `json:"@meta.collection,omitempty"`
+
+	// database ID
+	DatabaseID int64 `json:"@database.id,omitempty"`
+
+	// meta URI
+	MetaURI ID `json:"@meta.uri,omitempty"`
 }
 
 // Validate validates this id ref
 func (m *IDRef) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAtMetaID(formats); err != nil {
+	if err := m.validateCollectionURI(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateMetaURI(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -34,15 +44,31 @@ func (m *IDRef) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *IDRef) validateAtMetaID(formats strfmt.Registry) error {
+func (m *IDRef) validateCollectionURI(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AtMetaID) { // not required
+	if swag.IsZero(m.CollectionURI) { // not required
 		return nil
 	}
 
-	if err := m.AtMetaID.Validate(formats); err != nil {
+	if err := m.CollectionURI.Validate(formats); err != nil {
 		if ve, ok := err.(*errors.Validation); ok {
-			return ve.ValidateName("@meta.id")
+			return ve.ValidateName("@meta.collection")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (m *IDRef) validateMetaURI(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.MetaURI) { // not required
+		return nil
+	}
+
+	if err := m.MetaURI.Validate(formats); err != nil {
+		if ve, ok := err.(*errors.Validation); ok {
+			return ve.ValidateName("@meta.uri")
 		}
 		return err
 	}

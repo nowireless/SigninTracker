@@ -24,9 +24,9 @@ import (
 	"signin2/restapi/operations/teams"
 )
 
-// NewSignInTrackerAPI creates a new SignInTracker instance
-func NewSignInTrackerAPI(spec *loads.Document) *SignInTrackerAPI {
-	return &SignInTrackerAPI{
+// NewSigninAPI creates a new Signin instance
+func NewSigninAPI(spec *loads.Document) *SigninAPI {
+	return &SigninAPI{
 		handlers:            make(map[string]map[string]http.Handler),
 		formats:             strfmt.Default,
 		defaultConsumes:     "application/json",
@@ -89,8 +89,8 @@ func NewSignInTrackerAPI(spec *loads.Document) *SignInTrackerAPI {
 	}
 }
 
-/*SignInTrackerAPI the sign in tracker API */
-type SignInTrackerAPI struct {
+/*SigninAPI the signin API */
+type SigninAPI struct {
 	spec            *loads.Document
 	context         *middleware.Context
 	handlers        map[string]map[string]http.Handler
@@ -164,42 +164,42 @@ type SignInTrackerAPI struct {
 }
 
 // SetDefaultProduces sets the default produces media type
-func (o *SignInTrackerAPI) SetDefaultProduces(mediaType string) {
+func (o *SigninAPI) SetDefaultProduces(mediaType string) {
 	o.defaultProduces = mediaType
 }
 
 // SetDefaultConsumes returns the default consumes media type
-func (o *SignInTrackerAPI) SetDefaultConsumes(mediaType string) {
+func (o *SigninAPI) SetDefaultConsumes(mediaType string) {
 	o.defaultConsumes = mediaType
 }
 
 // SetSpec sets a spec that will be served for the clients.
-func (o *SignInTrackerAPI) SetSpec(spec *loads.Document) {
+func (o *SigninAPI) SetSpec(spec *loads.Document) {
 	o.spec = spec
 }
 
 // DefaultProduces returns the default produces media type
-func (o *SignInTrackerAPI) DefaultProduces() string {
+func (o *SigninAPI) DefaultProduces() string {
 	return o.defaultProduces
 }
 
 // DefaultConsumes returns the default consumes media type
-func (o *SignInTrackerAPI) DefaultConsumes() string {
+func (o *SigninAPI) DefaultConsumes() string {
 	return o.defaultConsumes
 }
 
 // Formats returns the registered string formats
-func (o *SignInTrackerAPI) Formats() strfmt.Registry {
+func (o *SigninAPI) Formats() strfmt.Registry {
 	return o.formats
 }
 
 // RegisterFormat registers a custom format validator
-func (o *SignInTrackerAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
+func (o *SigninAPI) RegisterFormat(name string, format strfmt.Format, validator strfmt.Validator) {
 	o.formats.Add(name, format, validator)
 }
 
-// Validate validates the registrations in the SignInTrackerAPI
-func (o *SignInTrackerAPI) Validate() error {
+// Validate validates the registrations in the SigninAPI
+func (o *SigninAPI) Validate() error {
 	var unregistered []string
 
 	if o.JSONConsumer == nil {
@@ -278,26 +278,26 @@ func (o *SignInTrackerAPI) Validate() error {
 }
 
 // ServeErrorFor gets a error handler for a given operation id
-func (o *SignInTrackerAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
+func (o *SigninAPI) ServeErrorFor(operationID string) func(http.ResponseWriter, *http.Request, error) {
 	return o.ServeError
 }
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
-func (o *SignInTrackerAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
+func (o *SigninAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
 
 	return nil
 
 }
 
 // Authorizer returns the registered authorizer
-func (o *SignInTrackerAPI) Authorizer() runtime.Authorizer {
+func (o *SigninAPI) Authorizer() runtime.Authorizer {
 
 	return nil
 
 }
 
 // ConsumersFor gets the consumers for the specified media types
-func (o *SignInTrackerAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
+func (o *SigninAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer {
 
 	result := make(map[string]runtime.Consumer)
 	for _, mt := range mediaTypes {
@@ -317,7 +317,7 @@ func (o *SignInTrackerAPI) ConsumersFor(mediaTypes []string) map[string]runtime.
 }
 
 // ProducersFor gets the producers for the specified media types
-func (o *SignInTrackerAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
+func (o *SigninAPI) ProducersFor(mediaTypes []string) map[string]runtime.Producer {
 
 	result := make(map[string]runtime.Producer)
 	for _, mt := range mediaTypes {
@@ -337,7 +337,7 @@ func (o *SignInTrackerAPI) ProducersFor(mediaTypes []string) map[string]runtime.
 }
 
 // HandlerFor gets a http.Handler for the provided operation method and path
-func (o *SignInTrackerAPI) HandlerFor(method, path string) (http.Handler, bool) {
+func (o *SigninAPI) HandlerFor(method, path string) (http.Handler, bool) {
 	if o.handlers == nil {
 		return nil, false
 	}
@@ -352,8 +352,8 @@ func (o *SignInTrackerAPI) HandlerFor(method, path string) (http.Handler, bool) 
 	return h, ok
 }
 
-// Context returns the middleware context for the sign in tracker API
-func (o *SignInTrackerAPI) Context() *middleware.Context {
+// Context returns the middleware context for the signin API
+func (o *SigninAPI) Context() *middleware.Context {
 	if o.context == nil {
 		o.context = middleware.NewRoutableContext(o.spec, o, nil)
 	}
@@ -361,7 +361,7 @@ func (o *SignInTrackerAPI) Context() *middleware.Context {
 	return o.context
 }
 
-func (o *SignInTrackerAPI) initHandlerCache() {
+func (o *SigninAPI) initHandlerCache() {
 	o.Context() // don't care about the result, just that the initialization happened
 
 	if o.handlers == nil {
@@ -447,7 +447,7 @@ func (o *SignInTrackerAPI) initHandlerCache() {
 
 // Serve creates a http handler to serve the API over HTTP
 // can be used directly in http.ListenAndServe(":8000", api.Serve(nil))
-func (o *SignInTrackerAPI) Serve(builder middleware.Builder) http.Handler {
+func (o *SigninAPI) Serve(builder middleware.Builder) http.Handler {
 	o.Init()
 
 	if o.Middleware != nil {
@@ -457,18 +457,18 @@ func (o *SignInTrackerAPI) Serve(builder middleware.Builder) http.Handler {
 }
 
 // Init allows you to just initialize the handler cache, you can then recompose the middleware as you see fit
-func (o *SignInTrackerAPI) Init() {
+func (o *SigninAPI) Init() {
 	if len(o.handlers) == 0 {
 		o.initHandlerCache()
 	}
 }
 
 // RegisterConsumer allows you to add (or override) a consumer for a media type.
-func (o *SignInTrackerAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
+func (o *SigninAPI) RegisterConsumer(mediaType string, consumer runtime.Consumer) {
 	o.customConsumers[mediaType] = consumer
 }
 
 // RegisterProducer allows you to add (or override) a producer for a media type.
-func (o *SignInTrackerAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
+func (o *SigninAPI) RegisterProducer(mediaType string, producer runtime.Producer) {
 	o.customProducers[mediaType] = producer
 }

@@ -4,25 +4,29 @@ package restapi
 
 import (
 	"crypto/tls"
+	"fmt"
 	"net/http"
 
 	errors "github.com/go-openapi/errors"
 	runtime "github.com/go-openapi/runtime"
 	middleware "github.com/go-openapi/runtime/middleware"
 
+	"signin2/app"
+	"signin2/database"
+	"signin2/models"
 	"signin2/restapi/operations"
 	"signin2/restapi/operations/meetings"
 	"signin2/restapi/operations/people"
 	"signin2/restapi/operations/teams"
 )
 
-//go:generate swagger generate server --target ..\..\signin2 --name SignInTracker --spec ..\swagger.yaml
+//go:generate swagger generate server --target ../../signin2 --name Signin --spec ../swagger.yaml
 
-func configureFlags(api *operations.SignInTrackerAPI) {
+func configureFlags(api *operations.SigninAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
 }
 
-func configureAPI(api *operations.SignInTrackerAPI) http.Handler {
+func configureAPI(api *operations.SigninAPI) http.Handler {
 	// configure the api here
 	api.ServeError = errors.ServeError
 
@@ -31,6 +35,20 @@ func configureAPI(api *operations.SignInTrackerAPI) http.Handler {
 	//
 	// Example:
 	// api.Logger = log.Printf
+
+	// Create app
+	config := app.Config{}
+	config.Database = database.Config{
+		User:     "signin",
+		Password: "foobar",
+		Host:     "localhost",
+		Port:     5432,
+		Database: "signin",
+	}
+	app, err := app.NewApp(config)
+	if err != nil {
+		panic(err)
+	}
 
 	api.JSONConsumer = runtime.JSONConsumer()
 
@@ -53,7 +71,14 @@ func configureAPI(api *operations.SignInTrackerAPI) http.Handler {
 	}
 	if api.MeetingsGetMeetingsHandler == nil {
 		api.MeetingsGetMeetingsHandler = meetings.GetMeetingsHandlerFunc(func(params meetings.GetMeetingsParams) middleware.Responder {
-			return middleware.NotImplemented("operation meetings.GetMeetings has not yet been implemented")
+
+			// body := meetings.GetMeetingsOKBody{}
+			// body.AtMetaID = models.ID(params.HTTPRequest.URL.RequestURI())
+			// body.Members = []*meetings.MembersItems0{}
+
+			// return meetings.NewGetMeetingsOK()
+			return middleware.NotImplemented("operation teams.GetMeetings has not yet been implemented")
+
 		})
 	}
 	if api.MeetingsGetMeetingsIDHandler == nil {
@@ -61,11 +86,24 @@ func configureAPI(api *operations.SignInTrackerAPI) http.Handler {
 			return middleware.NotImplemented("operation meetings.GetMeetingsID has not yet been implemented")
 		})
 	}
-	if api.PeopleGetPeopleHandler == nil {
-		api.PeopleGetPeopleHandler = people.GetPeopleHandlerFunc(func(params people.GetPeopleParams) middleware.Responder {
-			return middleware.NotImplemented("operation people.GetPeople has not yet been implemented")
-		})
-	}
+	// if api.PeopleGetPeopleHandler == nil {
+	api.PeopleGetPeopleHandler = people.GetPeopleHandlerFunc(func(params people.GetPeopleParams) middleware.Responder {
+		// return middleware.NotImplemented("operation people.GetPeople has not yet been implemented")
+		p, err := app.DB.GetPeople()
+		if err != nil {
+			fmt.Println("Error: ", err)
+			return people.NewGetPeopleDefault(500)
+		}
+
+		fmt.Println("People count:", len(p))
+
+		body := &people.GetPeopleOKBody{}
+		body.AtMetaID = models.ID(params.HTTPRequest.URL.RequestURI())
+		body.Members = p
+
+		return people.NewGetPeopleOK().WithPayload(body)
+	})
+	// }
 	if api.PeopleGetPeopleIDHandler == nil {
 		api.PeopleGetPeopleIDHandler = people.GetPeopleIDHandlerFunc(func(params people.GetPeopleIDParams) middleware.Responder {
 			return middleware.NotImplemented("operation people.GetPeopleID has not yet been implemented")

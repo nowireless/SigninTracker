@@ -20,14 +20,18 @@ import (
 // swagger:model Person
 type Person struct {
 
-	// person Id
-	PersonID int64 `json:"PersonId,omitempty"`
+	// database ID
+	DatabaseID *int64 `json:"@database.id,omitempty"`
 
 	// checkinid
-	Checkinid string `json:"checkinid,omitempty"`
+	Checkinid *string `json:"checkinid,omitempty"`
 
-	// mentor
-	Mentor *PersonMentor `json:"mentor,omitempty"`
+	// email
+	// Format: email
+	Email *strfmt.Email `json:"email,omitempty"`
+
+	// mentor of
+	MentorOf []*IDRef `json:"mentorOf"`
 
 	// name
 	Name *PersonName `json:"name,omitempty"`
@@ -36,7 +40,10 @@ type Person struct {
 	ParentOf []*PersonParentOfItems0 `json:"parentOf"`
 
 	// parents
-	Parents *PersonParents `json:"parents,omitempty"`
+	Parents []*IDRef `json:"parents"`
+
+	// phone
+	Phone *string `json:"phone,omitempty"`
 
 	// student
 	Student *PersonStudent `json:"student,omitempty"`
@@ -46,7 +53,11 @@ type Person struct {
 func (m *Person) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateMentor(formats); err != nil {
+	if err := m.validateEmail(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateMentorOf(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -72,19 +83,39 @@ func (m *Person) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Person) validateMentor(formats strfmt.Registry) error {
+func (m *Person) validateEmail(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Mentor) { // not required
+	if swag.IsZero(m.Email) { // not required
 		return nil
 	}
 
-	if m.Mentor != nil {
-		if err := m.Mentor.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("mentor")
-			}
-			return err
+	if err := validate.FormatOf("email", "body", "email", m.Email.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Person) validateMentorOf(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.MentorOf) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.MentorOf); i++ {
+		if swag.IsZero(m.MentorOf[i]) { // not required
+			continue
 		}
+
+		if m.MentorOf[i] != nil {
+			if err := m.MentorOf[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("mentorOf" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -139,13 +170,20 @@ func (m *Person) validateParents(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if m.Parents != nil {
-		if err := m.Parents.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("parents")
-			}
-			return err
+	for i := 0; i < len(m.Parents); i++ {
+		if swag.IsZero(m.Parents[i]) { // not required
+			continue
 		}
+
+		if m.Parents[i] != nil {
+			if err := m.Parents[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("parents" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -187,117 +225,19 @@ func (m *Person) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// PersonMentor person mentor
-// swagger:model PersonMentor
-type PersonMentor struct {
-
-	// teams
-	Teams []*IDRef `json:"teams"`
-}
-
-// Validate validates this person mentor
-func (m *PersonMentor) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateTeams(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PersonMentor) validateTeams(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Teams) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.Teams); i++ {
-		if swag.IsZero(m.Teams[i]) { // not required
-			continue
-		}
-
-		if m.Teams[i] != nil {
-			if err := m.Teams[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("mentor" + "." + "teams" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *PersonMentor) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *PersonMentor) UnmarshalBinary(b []byte) error {
-	var res PersonMentor
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
 // PersonName person name
 // swagger:model PersonName
 type PersonName struct {
 
 	// first
-	// Required: true
-	First *string `json:"first"`
+	First *string `json:"first,omitempty"`
 
 	// last
-	// Required: true
-	Last *string `json:"last"`
+	Last *string `json:"last,omitempty"`
 }
 
 // Validate validates this person name
 func (m *PersonName) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateFirst(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateLast(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PersonName) validateFirst(formats strfmt.Registry) error {
-
-	if err := validate.Required("name"+"."+"first", "body", m.First); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *PersonName) validateLast(formats strfmt.Registry) error {
-
-	if err := validate.Required("name"+"."+"last", "body", m.Last); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -431,84 +371,19 @@ func (m *PersonParentOfItems0) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// PersonParents person parents
-// swagger:model PersonParents
-type PersonParents struct {
-
-	// teams
-	Teams []*IDRef `json:"teams"`
-}
-
-// Validate validates this person parents
-func (m *PersonParents) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateTeams(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PersonParents) validateTeams(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Teams) { // not required
-		return nil
-	}
-
-	for i := 0; i < len(m.Teams); i++ {
-		if swag.IsZero(m.Teams[i]) { // not required
-			continue
-		}
-
-		if m.Teams[i] != nil {
-			if err := m.Teams[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("parents" + "." + "teams" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *PersonParents) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *PersonParents) UnmarshalBinary(b []byte) error {
-	var res PersonParents
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
 // PersonStudent person student
 // swagger:model PersonStudent
 type PersonStudent struct {
 
 	// graduation year
-	GraduationYear int64 `json:"graduationYear,omitempty"`
+	GraduationYear *int64 `json:"graduationYear,omitempty"`
 
 	// school email
 	// Format: email
-	SchoolEmail strfmt.Email `json:"schoolEmail,omitempty"`
+	SchoolEmail *strfmt.Email `json:"schoolEmail,omitempty"`
 
 	// school Id
-	SchoolID string `json:"schoolId,omitempty"`
+	SchoolID *string `json:"schoolId,omitempty"`
 
 	// teams
 	Teams []*IDRef `json:"teams"`

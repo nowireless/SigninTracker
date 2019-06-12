@@ -40,11 +40,13 @@ paths:
               "@meta.id":
                 $ref: "#/definitions/id"
               Members:
+                # anyOf:
+                #   - type: array
+                #     items:
+                #       $ref: "#/definitions/idRef"
                 type: array
                 items:
-                  allOf:
-                  - $ref: "#/definitions/idRef"
-                  - $ref: "#/definitions/Person"
+                  $ref: "#/definitions/Person"
             required:
               - Members
               - "@meta.id"
@@ -154,9 +156,12 @@ paths:
               Members:
                 type: array
                 items:
-                  allOf:
-                  - $ref: "#/definitions/idRef"
-                  - $ref: "#/definitions/Team"
+                  $ref: "#/definitions/Team"
+                # type: array
+                # items:
+                #   allOf:
+                #   - $ref: "#/definitions/idRef"
+                #   - $ref: "#/definitions/Team"
             required:
               - Members
               - "@meta.id"
@@ -289,9 +294,12 @@ paths:
               Members:
                 type: array
                 items:
-                  allOf:
-                  - $ref: "#/definitions/idRef"
-                  - $ref: "#/definitions/Meeting"
+                  $ref: "#/definitions/Meeting"
+                # type: array
+                # items:
+                #   allOf:
+                #   - $ref: "#/definitions/idRef"
+                #   - $ref: "#/definitions/Meeting"
             required:
               - Members
               - "@meta.id"
@@ -385,52 +393,61 @@ definitions:
     properties:
       # "@meta.id":
       #   $ref: "#/definitions/id"
-      PersonId:
+      '@database.id':
         type: integer
+        x-isnullable: true
+        x-go-name: DatabaseID
       name:
         type: object
         properties:
           first:
             type: string
             example: Ryan
+            x-isnullable: true
           last:
             type: string
             example: Sjostrand
-        required:
-          - first
-          - last
+            x-isnullable: true
+        # required:
+        #   - first
+        #   - last
       checkinid:
         type: string
+        x-isnullable: true
+      email:
+        type: string
+        format: email
+        x-isnullable: true
+      phone:
+        type: string
+        x-isnullable: true
       student:
         type: object
         properties:
           schoolId:
             type: string
             example: sjost150
+            x-isnullable: true    
           schoolEmail:
             type: string
             format: email
+            x-isnullable: true
           graduationYear:
             type: integer
             example: 2015
+            x-isnullable: true
           teams:
             type: array
             items:
               $ref: "#/definitions/idRef"
-      mentor:
-        type: object
-        properties:
-          teams:
-            type: array
-            items:
-              $ref: "#/definitions/idRef"
+      mentorOf:
+        type: array
+        items:
+          $ref: "#/definitions/idRef"
       parents:
-        type: object
-        properties:
-          teams:
-            type: array
-            items:
-              $ref: "#/definitions/idRef"
+        type: array
+        items:
+          $ref: "#/definitions/idRef"
       parentOf:
         type: array
         items:
@@ -441,10 +458,10 @@ definitions:
               enum: ["Father", "Mother", "Guardian"]
             student:
               $ref: "#/definitions/idRef"
-    required:
-      # - "@meta.id"
-      - name
-      - id
+    # required:
+    #   # - "@meta.id"
+    #   - name
+    #   - id
 
   # Mentor:
   #   type: object
@@ -474,8 +491,10 @@ definitions:
   Meeting:
     type: object
     properties:
-      id:
-        type: string
+      '@database.id':
+        type: integer
+        x-isnullable: false
+        x-go-name: DatabaseID
       Day:
         type: string
         format: date
@@ -509,6 +528,10 @@ definitions:
   Team:
     type: object
     properties:
+      '@database.id':
+        type: integer
+        x-isnullable: false
+        x-go-name: DatabaseID
       Competition:
         type: string
         enum: ["FRC", "FTC", "FLL", "FLLjr"]
@@ -600,6 +623,13 @@ definitions:
     additionalProperties: false
     description: A reference to a resource.
     properties:
-      '@meta.id':
+      '@database.id':
+        type: integer
+        x-go-name: DatabaseID
+      '@meta.collection':
         $ref: '#/definitions/id'
+        x-go-name: CollectionURI
+      '@meta.uri':
+        $ref: '#/definitions/id'
+        x-go-name: MetaURI
     type: object
