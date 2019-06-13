@@ -35,15 +35,38 @@ func (api *API) Initialize(r *mux.Router) error {
 	// Service Root
 	r.HandleFunc("", api.notImplemented).Methods("GET")
 
-	r.HandleFunc("/people", app.GetPeopleCollection).Methods("GET")
-	r.HandleFunc("/people", api.notImplemented).Methods("POST")
-
-	r.HandleFunc("/people/{id}", app.GetPerson).Methods("GET")
-	r.HandleFunc("/people/{id}", api.notImplemented).Methods("PATCH")
-	r.HandleFunc("/people/{id}", api.notImplemented).Methods("PUT")
-	r.HandleFunc("/people/{id}", api.notImplemented).Methods("DELETE")
-
+	r.HandleFunc("/people", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/people/{id}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/people/{id}/attendance", app.GetPersonAttendance).Methods("GET")
+	r.HandleFunc("/people/{id}/mentors", api.notImplemented).Methods("POST")
+	r.HandleFunc("/people/{id}/mentors/{tid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/people/{id}/studentOf", api.notImplemented).Methods("POST")
+	r.HandleFunc("/people/{id}/studentOf/{tid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/people/{id}/parents", api.notImplemented).Methods("POST")
+	r.HandleFunc("/people/{id}/parents/{pid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/people/{id}/parentsOf", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/people/{id}/parentsOf/{sid}", api.notImplemented).Methods("DELETE")
+
+	r.HandleFunc("/meetings", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/meetings/{id}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
+	r.HandleFunc("/meetings/{id}/teams", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/meetings/{id}/teams/{tid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/meetings/{id}/commitments", api.notImplemented).Methods("POST")
+	r.HandleFunc("/meetings/{id}/commitments/{id}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/meetings/{id}/signins", api.notImplemented).Methods("POST")
+	r.HandleFunc("/meetings/{id}/signins/{id}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
+	r.HandleFunc("/meetings/{id}/signouts", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/meetings/{id}/signouts/{id}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
+	r.HandleFunc("/meetings/{id}/attendance", api.notImplemented).Methods("GET")
+
+	r.HandleFunc("/teams", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/teams/{id}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
+	r.HandleFunc("/teams/{id}/mentors", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/teams/{id}/mentors/{mid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/teams/{id}/students", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/teams/{id}/students/{sid}", api.notImplemented).Methods("DELETE")
+	r.HandleFunc("/teams/{id}/meetings", api.notImplemented).Methods("GET", "POST")
+	r.HandleFunc("/teams/{id}/meetings/{mid}", api.notImplemented).Methods("GET", "PATCH", "DELETE")
 
 	return nil
 }
