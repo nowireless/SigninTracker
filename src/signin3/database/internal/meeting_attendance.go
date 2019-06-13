@@ -14,12 +14,12 @@ type MeetingAttendance struct {
 	OutTime   sql.NullString
 }
 
-func (ma *MeetingAttendance) Model() *models.MeetingAttendance {
+func (ma *MeetingAttendance) Model() models.MeetingAttendance {
 	result := models.MeetingAttendance{}
 	result.PersonID = makeLink("/people", ma.PersonID)
 	result.MeetingID = makeLink("/meetings", ma.MeetingID)
 	result.InTime = ma.InTime
 	result.OutTime = getNullString(ma.OutTime)
 
-	return &result
+	return result
 }

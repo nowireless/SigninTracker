@@ -38,12 +38,12 @@ func (api *API) Initialize(r *mux.Router) error {
 	r.HandleFunc("/people", app.GetPeopleCollection).Methods("GET")
 	r.HandleFunc("/people", api.notImplemented).Methods("POST")
 
-	r.HandleFunc("/people/{id}", api.notImplemented).Methods("GET")
+	r.HandleFunc("/people/{id}", app.GetPerson).Methods("GET")
 	r.HandleFunc("/people/{id}", api.notImplemented).Methods("PATCH")
 	r.HandleFunc("/people/{id}", api.notImplemented).Methods("PUT")
 	r.HandleFunc("/people/{id}", api.notImplemented).Methods("DELETE")
 
-	r.HandleFunc("/people/{id}/attendance", api.notImplemented).Methods("GET")
+	r.HandleFunc("/people/{id}/attendance", app.GetPersonAttendance).Methods("GET")
 
 	return nil
 }

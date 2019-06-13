@@ -69,7 +69,10 @@ func (db *Database) GetPerson(id int) (*models.Person, error) {
 	}
 
 	person := internal.Person{}
-	row.StructScan(&person)
+	err := row.StructScan(&person)
+	if err != nil {
+		return nil, err
+	}
 	m := person.Model()
 	return &m, nil
 
@@ -85,4 +88,36 @@ func (db *Database) UpdatePerson(*models.Person) error {
 
 func (db *Database) DeletePerson(*models.Person) error {
 	panic("TODO")
+}
+
+func (db *Database) GetPersonAttendances(personID int) ([]models.MeetingAttendance, error) {
+	// What is a lateral join? See the following
+	// https://medium.com/kkempin/postgresqls-lateral-join-bfd6bd0199df
+	rows, err := db.DB.Queryx(`
+		SELECT signed_in.meetingid, signed_in.personid, signed_in.intime, check_outs.outtime
+		FROM signed_in
+			LEFT JOIN LATERAL
+		(SELECT meetingid, personid, outtime
+		FROM signed_out
+		WHERE signed_in.meetingid = signed_out.meetingid
+		AND signed_in.personid = signed_out.personid) check_outs ON TRUE
+		WHERE signed_in.personid = $1;
+	`, personID)
+
+	if err != nil {
+		return nil, err
+	}
+
+	results := []models.MeetingAttendance{}
+	for rows.Next() {
+		result := internal.MeetingAttendance{}
+		err := rows.StructScan(&result)
+		if err != nil {
+			return nil, err
+		}
+
+		results = append(results, result.Model())
+	}
+
+	return results, nil
 }
