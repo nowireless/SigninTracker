@@ -1,39 +1,32 @@
 package models
 
 type Person struct {
-	URI        string
-	DatabaseID int
+	// Read Only
+	URI        string `meta:"readonly"`
+	DatabaseID int    `meta:"readonly"`
 
-	CheckInID *string
-	FirstName *string
-	LastName  *string
+	// Read/Write
+	CheckInID *string `meta:"requiredOnCreate"`
+	FirstName *string `meta:"requiredOnCreate"`
+	LastName  *string `meta:"requiredOnCreate"`
 	Phone     *string
 	Email     *string
 
 	Student *Student
 	Mentor  *Mentor
 
-	ParentOf []Link
-	// Parents  []ParentRelation
-	Parents []Link // TODO use ParentRelation
+	ParentOf []Link `meta:"readonly"`
+	Parents  []Link `meta:"readonly"`
 
-	Teams      []Link
-	Committed  []Link
-	Attendance Link // Link to MeetingAttendance
+	Attendance Link `meta:"readonly"` // Link to MeetingAttendance
 }
 
 type Student struct {
 	SchoolEmail *string
 	SchoolID    *string
-	Teams       []Link
+	Teams       []Link `meta:"readonly"`
 }
 
 type Mentor struct {
-	Teams []Link
-}
-
-// TODO: Include this structure in people
-type ParentRelation struct {
-	Relation string
-	Parent   Link
+	Teams []Link `meta:"readonly"`
 }
