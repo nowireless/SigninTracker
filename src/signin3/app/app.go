@@ -6,8 +6,7 @@ import (
 	"signin3/database"
 	"signin3/models"
 	"strconv"
-
-	"github.com/gorilla/mux"
+	"strings"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -21,7 +20,8 @@ type Config struct {
 }
 
 type App struct {
-	DB *database.Database
+	DB     *database.Database
+	People PersonHandlers
 }
 
 func NewApp(config Config) (*App, error) {
@@ -34,100 +34,78 @@ func NewApp(config Config) (*App, error) {
 	}
 
 	// Other initialization logic here...
+	app.People = PersonHandlers{DB: app.DB}
 
 	return &app, nil
 }
 
-func (app *App) GetPeopleCollection(w http.ResponseWriter, r *http.Request) {
-	people, err := app.DB.GetPeople()
-	if err != nil {
-		log.Error(err)
-		e := models.Error{Code: 500, Error: "Error accessing database"}
-		app.InternalError(w, r, e)
-		return
+func InternalError(w http.ResponseWriter, r *http.Request, err error, errorMsg string) {
+	log.Error(err)
+	e := models.Error{
+		Code:  http.StatusInternalServerError,
+		Error: errorMsg,
 	}
-
-	collection := map[string]interface{}{}
-	collection["@uri"] = r.RequestURI
-	collection["Members"] = people
-
-	body, err := json.Marshal(collection)
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(body)
+	writeError(w, r, e)
 }
 
-func (app *App) GetPerson(w http.ResponseWriter, r *http.Request) {
-	idRaw := mux.Vars(r)["id"]
-	id, err := strconv.ParseInt(idRaw, 10, 32)
-	if err != nil {
-		log.Error(err)
-		e := models.Error{Code: http.StatusBadRequest, Error: "Unable to parse database id"}
-		app.InternalError(w, r, e)
-		return
+func NotImplemented(w http.ResponseWriter, r *http.Request) {
+	e := models.Error{
+		Code:  http.StatusNotImplemented,
+		Error: "Reqest not implemented",
 	}
-
-	log.Info("Getting attendance for person id: ", id)
-
-	person, err := app.DB.GetPerson(int(id))
-	if err != nil {
-		log.Error(err)
-		e := models.Error{Code: http.StatusInternalServerError, Error: "Database error"}
-		app.InternalError(w, r, e)
-		return
-	}
-
-	body, err := json.Marshal(person)
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(body)
+	writeError(w, r, e)
 }
 
-func (app *App) GetPersonAttendance(w http.ResponseWriter, r *http.Request) {
-	idRaw := mux.Vars(r)["id"]
-	id, err := strconv.ParseInt(idRaw, 10, 32)
-	if err != nil {
-		log.Error(err)
-		e := models.Error{Code: http.StatusBadRequest, Error: "Unable to parse database id"}
-		app.InternalError(w, r, e)
-		return
+func MethodNotAllowed(w http.ResponseWriter, r *http.Request) {
+	e := models.Error{
+		Code:  http.StatusMethodNotAllowed,
+		Error: "Method not allowed: " + r.Method,
 	}
-
-	log.Info("Getting attendance for person id: ", id)
-
-	attendance, err := app.DB.GetPersonAttendances(int(id))
-	if err != nil {
-		log.Error(err)
-		e := models.Error{Code: http.StatusInternalServerError, Error: "Database error"}
-		app.InternalError(w, r, e)
-		return
-	}
-
-	body, err := json.Marshal(attendance)
-	if err != nil {
-		panic(err)
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	w.Write(body)
+	writeError(w, r, e)
 }
 
-func (app *App) InternalError(w http.ResponseWriter, r *http.Request, e models.Error) {
+func MalformedJSON(w http.ResponseWriter, r *http.Request) {
+	e := models.Error{
+		Code:  http.StatusBadRequest,
+		Error: "Malformed JSON in request body",
+	}
+	writeError(w, r, e)
+}
+
+func MissingRequiredOnCreate(w http.ResponseWriter, r *http.Request, missing []string) {
+	e := models.Error{
+		Code:  http.StatusBadRequest,
+		Error: "Missing required on create fields: " + strings.Join(missing, ", "),
+	}
+	writeError(w, r, e)
+}
+
+func writeError(w http.ResponseWriter, r *http.Request, e models.Error) {
 	body, err := json.Marshal(e)
 	if err != nil {
 		panic(err)
 	}
+	writeJSON(w, e.Code, body)
+}
 
+func writeStruct(w http.ResponseWriter, status int, v interface{}) {
+	body, err := json.Marshal(v)
+	if err != nil {
+		panic(err)
+	}
+	writeJSON(w, status, body)
+}
+
+func writeJSON(w http.ResponseWriter, status int, body []byte) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(e.Code)
+	w.WriteHeader(status)
 	w.Write(body)
+}
+
+func parseInt(idStr string) (int, error) {
+	id, err := strconv.ParseInt(idStr, 10, 32)
+	if err != nil {
+		return 0, err
+	}
+	return int(id), nil
 }

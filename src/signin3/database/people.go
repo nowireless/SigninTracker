@@ -1,6 +1,7 @@
 package database
 
 import (
+	"errors"
 	"signin3/database/internal"
 	"signin3/models"
 )
@@ -79,7 +80,7 @@ func (db *Database) GetPerson(id int) (*models.Person, error) {
 }
 
 func (db *Database) CreatePerson(*models.Person) error {
-	panic("TODO")
+	return errors.New("TODO")
 }
 
 func (db *Database) UpdatePerson(*models.Person) error {
