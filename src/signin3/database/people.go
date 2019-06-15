@@ -1,7 +1,6 @@
 package database
 
 import (
-	"errors"
 	"signin3/database/internal"
 	"signin3/models"
 )
@@ -79,8 +78,33 @@ func (db *Database) GetPerson(id int) (*models.Person, error) {
 
 }
 
-func (db *Database) CreatePerson(*models.Person) error {
-	return errors.New("TODO")
+func (db *Database) CreatePerson(mPerson *models.Person) error {
+	person := internal.NewPerson(mPerson)
+
+	row := db.DB.QueryRowx(`
+		INSERT INTO people(checkinid, firstname, lastname, email, phone, schoolemail, schoolid)
+		VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING personid;`,
+		person.CheckInID,
+		person.FirstName,
+		person.LastName,
+		person.Email,
+		person.Phone,
+		person.SchoolEmail,
+		person.SchoolID,
+	)
+
+	if err := row.Err(); err != nil {
+		return err
+	}
+
+	var id int
+	if err := row.Scan(&id); err != nil {
+		return err
+	}
+
+	mPerson.DatabaseID = id
+
+	return nil
 }
 
 func (db *Database) UpdatePerson(*models.Person) error {

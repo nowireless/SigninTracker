@@ -38,3 +38,15 @@ func getNullString(value sql.NullString) *string {
 
 	return nil
 }
+
+func setNullString(value *string) sql.NullString {
+	result := sql.NullString{}
+	if value == nil {
+		result.Valid = false
+	} else {
+		result.Valid = true
+		result.String = *value
+	}
+
+	return result
+}

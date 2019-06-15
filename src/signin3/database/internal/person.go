@@ -60,3 +60,21 @@ func (p *Person) Model() models.Person {
 
 	return result
 }
+
+// NewPerson creates a new Person structure from the non-dervied fields from the person model
+func NewPerson(m *models.Person) Person {
+	result := Person{}
+
+	result.PersonID = int64(m.DatabaseID)
+	result.CheckInID = *m.CheckInID
+	result.FirstName = *m.FirstName
+	result.LastName = *m.LastName
+	result.Email = setNullString(m.Email)
+	result.Phone = setNullString(m.Phone)
+	if m.Student != nil {
+		result.SchoolEmail = setNullString(m.Student.SchoolEmail)
+		result.SchoolID = setNullString(m.Student.SchoolID)
+	}
+
+	return result
+}
