@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"signin3/models"
 
 	_ "github.com/jackc/pgx/stdlib"
 	log "github.com/sirupsen/logrus"
@@ -42,4 +43,41 @@ func Connect(config Config) (*Database, error) {
 	db.Ping()
 
 	return &Database{DB: db}, nil
+}
+
+func (db *Database) Create(obj models.Model) error {
+	switch v := obj.(type) {
+	case *models.Person:
+		return db.CreatePerson(v)
+	}
+
+	return fmt.Errorf("Unsupported type: %T", obj)
+}
+
+func (db *Database) Get(objType interface{}, databaseID int) (interface{}, error) {
+	switch v := objType.(type) {
+	case models.Person:
+		return db.GetPerson(databaseID)
+	default:
+		return nil, fmt.Errorf("Unsupported type: %T", v)
+
+	}
+}
+
+func (db *Database) Update(obj interface{}) error {
+	switch v := obj.(type) {
+	case models.Person:
+		return db.UpdatePerson(v)
+	default:
+		return fmt.Errorf("Unsupported type: %T", v)
+	}
+}
+
+func (db *Database) Delete(obj interface{}) error {
+	switch v := obj.(type) {
+	case *models.Person:
+		return db.DeletePerson(v)
+	default:
+		return fmt.Errorf("Unsupported type: %T", v)
+	}
 }

@@ -7,6 +7,10 @@ import (
 	"signin3/database"
 	"signin3/models"
 	"signin3/tags"
+	"strings"
+
+	jsonpatch "github.com/evanphx/json-patch"
+	"github.com/jackc/pgx"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
@@ -17,6 +21,22 @@ type PersonHandlers struct {
 }
 
 func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
+	ctx := handlerContext{w: w, r: r, db: h.DB}
+	ctx.unmarshalJSON = func(raw []byte) (models.Model, error) {
+		p := models.Person{}
+		if err := json.Unmarshal(raw, &p); err != nil {
+			return nil, err
+		}
+		return &p, nil
+	}
+	ctx.marshalJSON = func(obj models.Model) []byte {
+		objJSON, err := json.Marshal(obj)
+		if err != nil {
+			panic(err)
+		}
+		return objJSON
+	}
+
 	switch r.Method {
 	case http.MethodGet:
 		people, err := h.DB.GetPeople()
@@ -53,6 +73,13 @@ func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 
 		err = h.DB.CreatePerson(&p)
 		if err != nil {
+			// TODO the following should maybe move to database package?
+			// Create a custom error struct for friendlier error handle
+			if pgxErr, ok := err.(pgx.PgError); ok && pgxErr.Code == "23505" {
+				e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
+				writeError(w, r, e)
+				return
+			}
 			InternalError(w, r, err, "Database Error")
 			return
 		}
@@ -82,6 +109,8 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		log.Info("Getting person with id: ", id)
 
+		// TODO add check for if the ID does not exist, add special error in database package.
+		// ERRO[0708] sql: no rows in result set
 		person, err := h.DB.GetPerson(int(id))
 		if err != nil {
 			InternalError(w, r, err, "Database error")
@@ -90,9 +119,103 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 
 		writeStruct(w, http.StatusOK, person)
 	case http.MethodPatch:
-		NotImplemented(w, r)
+		requestBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			panic(err)
+		}
+
+		// Check for malformed JSON
+		patch := map[string]interface{}{}
+		err = json.Unmarshal(requestBody, &patch)
+		if err != nil {
+			log.Error(err)
+			MalformedJSON(w, r)
+			return
+		}
+
+		// Check for known fields
+		// TODO
+
+		// Check the patch to see if it modifying readonly fields
+		violations := tags.CheckPatchReadonly(models.Person{}, patch)
+		if len(violations) > 0 {
+			e := models.Error{
+				Code:  http.StatusBadRequest,
+				Error: "Setting read only fields: " + strings.Join(violations, ", "),
+			}
+			writeError(w, r, e)
+			return
+		}
+
+		// TODO Begin transaction
+		// Fetch current values of person
+		person, err := h.DB.GetPerson(int(id))
+		if err != nil {
+			InternalError(w, r, err, "Database error")
+			return
+		}
+
+		// Convert source struct to JSON
+		originalJSON, err := json.Marshal(person)
+		if err != nil {
+			panic(err)
+		}
+
+		// Apply JSON merge patch
+		modifiedJSON, err := jsonpatch.MergePatch(originalJSON, requestBody)
+		if err != nil {
+			log.Error(err)
+			// TODO Roll back transaction
+			e := models.Error{Code: http.StatusBadRequest, Error: "Unable to apply merge patch"}
+			writeError(w, r, e)
+			return
+		}
+
+		// Convert dest JSON to person model
+		modified := models.Person{}
+		err = json.Unmarshal(modifiedJSON, &modified)
+		if err != nil {
+			panic(err)
+		}
+
+		// Update person in database
+		err = h.DB.UpdatePerson(modified)
+		if err != nil {
+			InternalError(w, r, err, "Database error")
+			return
+		}
+
+		result, err := h.DB.GetPerson(int(id))
+		if err != nil {
+			InternalError(w, r, err, "Database error")
+			return
+		}
+
+		// TODO End transaction
+
+		writeStruct(w, http.StatusOK, result)
 	case http.MethodDelete:
-		NotImplemented(w, r)
+
+		// TODO Begin tranaction
+
+		// Get person
+		person, err := h.DB.GetPerson(int(id))
+		if err != nil {
+			InternalError(w, r, err, "Database error")
+			return
+		}
+
+		// Perform deletion
+		err = h.DB.DeletePerson(person)
+		if err != nil {
+			InternalError(w, r, err, "Database error")
+			return
+		}
+
+		// TODO End transaction
+
+		// Return deleted person
+		writeStruct(w, http.StatusOK, person)
 	default:
 		MethodNotAllowed(w, r)
 	}

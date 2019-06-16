@@ -72,7 +72,7 @@ func (api *API) Initialize(r *mux.Router) error {
 }
 
 func (api *API) notImplemented(w http.ResponseWriter, r *http.Request) {
-	e := models.Error{Code: 501, Error: "Reqest not implemented"}
+	e := models.Error{Code: 501, Error: "Request not implemented"}
 	body, err := json.Marshal(e)
 	if err != nil {
 		panic(err)

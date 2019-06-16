@@ -1,5 +1,10 @@
 package models
 
+// TODO make DatabaseID a pointer
+type Model interface {
+	GetDatabaseID() int
+}
+
 type Time string
 
 type Link struct {

@@ -3,6 +3,8 @@ package database
 import (
 	"signin3/database/internal"
 	"signin3/models"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func (db *Database) GetPeople() ([]models.Person, error) {
@@ -107,8 +109,33 @@ func (db *Database) CreatePerson(mPerson *models.Person) error {
 	return nil
 }
 
-func (db *Database) UpdatePerson(*models.Person) error {
-	panic("TODO")
+func (db *Database) UpdatePerson(model models.Person) error {
+	person := internal.NewPerson(&model)
+
+	log.Info("Updating person with ID: ", person.PersonID)
+
+	_, err := db.DB.Exec(`
+		UPDATE people SET
+			checkinid    = $1,
+			firstname    = $2,
+			lastname     = $3,
+			email        = $4,
+			phone        = $5,
+			schoolid     = $6,
+			schoolemail  = $7
+		WHERE personid = $8;
+		`,
+		person.CheckInID,
+		person.FirstName,
+		person.LastName,
+		person.Email,
+		person.Phone,
+		person.SchoolID,
+		person.SchoolEmail,
+		person.PersonID,
+	)
+
+	return err
 }
 
 func (db *Database) DeletePerson(*models.Person) error {

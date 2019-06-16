@@ -2,8 +2,8 @@ package models
 
 type Person struct {
 	// Read Only
-	URI        string `meta:"readonly"`
-	DatabaseID int    `meta:"readonly"`
+	URI        string `meta:"readOnly"`
+	DatabaseID int    `meta:"readOnly"`
 
 	// Read/Write
 	CheckInID *string `meta:"requiredOnCreate"`
@@ -15,18 +15,22 @@ type Person struct {
 	Student *Student
 	Mentor  *Mentor
 
-	ParentOf []Link `meta:"readonly"`
-	Parents  []Link `meta:"readonly"`
+	ParentOf []Link `meta:"readOnly"`
+	Parents  []Link `meta:"readOnly"`
 
-	Attendance Link `meta:"readonly"` // Link to MeetingAttendance
+	Attendance Link `meta:"readOnly"` // Link to MeetingAttendance
+}
+
+func (p Person) GetDatabaseID() int {
+	return p.DatabaseID
 }
 
 type Student struct {
 	SchoolEmail *string
 	SchoolID    *string
-	Teams       []Link `meta:"readonly"`
+	Teams       []Link `meta:"readOnly"`
 }
 
 type Mentor struct {
-	Teams []Link `meta:"readonly"`
+	Teams []Link `meta:"readOnly"`
 }

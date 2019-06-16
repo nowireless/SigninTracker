@@ -110,6 +110,11 @@ func serve(ctx context.Context, config Config) {
 		})
 	})
 
+	r.Use(handlers.RecoveryHandler(
+		handlers.RecoveryLogger(&loggerImpl{}),
+		handlers.PrintRecoveryStack(true),
+	))
+
 	// Server setup
 	address := fmt.Sprintf("%s:%d", config.Network, config.Port)
 	s := &http.Server{
@@ -133,4 +138,11 @@ func serve(ctx context.Context, config Config) {
 		log.Error(err)
 	}
 	<-done
+}
+
+// Recovery
+type loggerImpl struct{}
+
+func (l *loggerImpl) Println(args ...interface{}) {
+	log.Error(append([]interface{}{"Panic in handler: "}, args...))
 }
