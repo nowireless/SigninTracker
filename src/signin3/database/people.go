@@ -138,8 +138,11 @@ func (db *Database) UpdatePerson(model models.Person) error {
 	return err
 }
 
-func (db *Database) DeletePerson(*models.Person) error {
-	panic("TODO")
+func (db *Database) DeletePerson(model *models.Person) error {
+	// TODO: Some how mark/(remove database id) to indicate that the model no longer represents a row in the db
+	person := internal.NewPerson(model)
+	_, err := db.DB.Exec("DELETE FROM PEOPLE WHERE personid = $1", person.PersonID)
+	return err
 }
 
 func (db *Database) GetPersonAttendances(personID int) ([]models.MeetingAttendance, error) {
