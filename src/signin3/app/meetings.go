@@ -10,20 +10,19 @@ import (
 	"strings"
 
 	jsonpatch "github.com/evanphx/json-patch"
-	"github.com/jackc/pgx"
-
 	"github.com/gorilla/mux"
+	"github.com/jackc/pgx"
 	log "github.com/sirupsen/logrus"
 )
 
-type PersonHandlers struct {
+type MeetingHandlers struct {
 	DB *database.Database
 }
 
-func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
+func (h *MeetingHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		people, err := h.DB.GetPeople()
+		people, err := h.DB.GetMeetings()
 		if err != nil {
 			InternalError(w, r, err, "Error accessing database")
 			return
@@ -41,21 +40,21 @@ func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 			panic(err)
 		}
 
-		p := models.Person{}
-		err = json.Unmarshal(requestBody, &p)
+		m := models.Meeting{}
+		err = json.Unmarshal(requestBody, &m)
 		if err != nil {
 			log.Error(err)
 			MalformedJSON(w, r)
 			return
 		}
 
-		missing := tags.CheckRequiredOnCreate(p)
+		missing := tags.CheckRequiredOnCreate(m)
 		if len(missing) > 0 {
 			MissingRequiredOnCreate(w, r, missing)
 			return
 		}
 
-		err = h.DB.CreatePerson(&p)
+		err = h.DB.CreateMeeting(&m)
 		if err != nil {
 			// TODO the following should maybe move to database package?
 			// Create a custom error struct for friendlier error handle
@@ -68,7 +67,7 @@ func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		result, err := h.DB.GetPerson(p.DatabaseID)
+		result, err := h.DB.GetMeeting(m.DatabaseID)
 		if err != nil {
 			InternalError(w, r, err, "Database Error")
 			return
@@ -81,7 +80,7 @@ func (h *PersonHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
+func (h *MeetingHandlers) MeetingID(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := parseInt(vars["id"])
 	if err != nil {
@@ -93,11 +92,11 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		log.Info("Getting person with id: ", id)
+		log.Info("Getting meeting with id: ", id)
 
 		// TODO add check for if the ID does not exist, add special error in database package.
 		// ERRO[0708] sql: no rows in result set
-		person, err := h.DB.GetPerson(int(id))
+		person, err := h.DB.GetMeeting(int(id))
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
@@ -135,7 +134,7 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 
 		// TODO Begin transaction
 		// Fetch current values of person
-		person, err := h.DB.GetPerson(int(id))
+		person, err := h.DB.GetMeeting(int(id))
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
@@ -158,20 +157,20 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Convert dest JSON to person model
-		modified := models.Person{}
+		modified := models.Meeting{}
 		err = json.Unmarshal(modifiedJSON, &modified)
 		if err != nil {
 			panic(err)
 		}
 
 		// Update person in database
-		err = h.DB.UpdatePerson(modified)
+		err = h.DB.UpdateMeeting(modified)
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
 
-		result, err := h.DB.GetPerson(int(id))
+		result, err := h.DB.GetMeeting(int(id))
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
@@ -185,14 +184,14 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 		// TODO Begin tranaction
 
 		// Get person
-		person, err := h.DB.GetPerson(int(id))
+		meeting, err := h.DB.GetMeeting(int(id))
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
 
 		// Perform deletion
-		err = h.DB.DeletePerson(person)
+		err = h.DB.DeleteMeeting(meeting)
 		if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
@@ -201,13 +200,13 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 		// TODO End transaction
 
 		// Return deleted person
-		writeStruct(w, http.StatusOK, person)
+		writeStruct(w, http.StatusOK, meeting)
 	default:
 		MethodNotAllowed(w, r)
 	}
 }
 
-func (h *PersonHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
+func (h *MeetingHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		MethodNotAllowed(w, r)
 		return
@@ -221,9 +220,9 @@ func (h *PersonHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info("Getting attendance for person id: ", id)
+	log.Info("Getting attendance for meeting id: ", id)
 
-	attendance, err := h.DB.GetPersonAttendances(id)
+	attendance, err := h.DB.GetMeetingAttendance(id)
 	if err != nil {
 		InternalError(w, r, err, "Database error")
 		return
@@ -232,151 +231,34 @@ func (h *PersonHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
 	writeStruct(w, http.StatusOK, attendance)
 }
 
-func (h *PersonHandlers) MentorOf(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) Teams(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) MentorOfID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) RemoveTeam(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) StudentOf(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) Commitments(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) StudentOfID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) RemoveCommitment(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) Parents(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) SignIns(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) ParentsID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) SignInsID(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) ParentOf(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) SignOuts(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
 
-func (h *PersonHandlers) ParentOfID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
-		return
-	}
-
-	NotImplemented(w, r)
+func (h *MeetingHandlers) SignOutsID(w http.ResponseWriter, r *http.Request) {
+	panic("TODO")
 }
-
-// func (app *App) getPeopleCollection(w http.ResponseWriter, r *http.Request) {
-// 	people, err := app.DB.GetPeople()
-// 	if err != nil {
-// 		log.Error(err)
-// 		e := models.Error{Code: 500, Error: "Error accessing database"}
-// 		app.InternalError(w, r, e)
-// 		return
-// 	}
-
-// 	collection := map[string]interface{}{}
-// 	collection["@uri"] = r.RequestURI
-// 	collection["Members"] = people
-
-// 	body, err := json.Marshal(collection)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(200)
-// 	w.Write(body)
-// }
-
-// func (app *App) getPerson(w http.ResponseWriter, r *http.Request) {
-// 	idRaw := mux.Vars(r)["id"]
-// 	id, err := strconv.ParseInt(idRaw, 10, 32)
-// 	if err != nil {
-// 		log.Error(err)
-// 		e := models.Error{Code: http.StatusBadRequest, Error: "Unable to parse database id"}
-// 		app.InternalError(w, r, e)
-// 		return
-// 	}
-
-// 	log.Info("Getting person with id: ", id)
-
-// 	person, err := app.DB.GetPerson(int(id))
-// 	if err != nil {
-// 		log.Error(err)
-// 		e := models.Error{Code: http.StatusInternalServerError, Error: "Database error"}
-// 		app.InternalError(w, r, e)
-// 		return
-// 	}
-
-// 	body, err := json.Marshal(person)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	w.WriteHeader(200)
-// 	w.Write(body)
-// }
-
-// func (app *App) getPersonAttendance(w http.ResponseWriter, r *http.Request) {
-// 	vars := mux.Vars(r)
-// 	id, err := getInt(vars["id"])
-// 	if err != nil {
-// 		InternalError(w, r, err, "Unable to parse database id")
-// 		return
-// 	}
-
-// 	log.Info("Getting attendance for person id: ", id)
-
-// 	attendance, err := app.DB.GetPersonAttendances(id)
-// 	if err != nil {
-// 		InternalError(w, r, err, "Database error")
-// 		return
-// 	}
-
-// 	body, err := json.Marshal(attendance)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	writeJSON(w, http.StatusOK, body)
-// }

@@ -20,8 +20,9 @@ type Config struct {
 }
 
 type App struct {
-	DB     *database.Database
-	People PersonHandlers
+	DB       *database.Database
+	People   PersonHandlers
+	Meetings MeetingHandlers
 }
 
 func NewApp(config Config) (*App, error) {
@@ -35,6 +36,7 @@ func NewApp(config Config) (*App, error) {
 
 	// Other initialization logic here...
 	app.People = PersonHandlers{DB: app.DB}
+	app.Meetings = MeetingHandlers{DB: app.DB}
 
 	return &app, nil
 }

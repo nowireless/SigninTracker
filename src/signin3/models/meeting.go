@@ -1,19 +1,24 @@
 package models
 
 type Meeting struct {
-	databaseID int
+	DatabaseID int    `meta:"readOnly"`
+	URI        string `meta:"readOnly"`
 
-	Day       *string
-	StartTime *string
-	EndTime   *string
+	Day       *string `meta:"requiredOnCreate"`
+	StartTime *string `meta:"requiredOnCreate"`
+	EndTime   *string `meta:"requiredOnCreate"`
 
-	Committed []Link
-	SignedIn  []Link
-	SingedOut []Link
+	Committed []Link `meta:"readOnly"`
+	SignedIn  []Link `meta:"readOnly"`
+	SingedOut []Link `meta:"readOnly"`
 
-	Teams TeamMeeting
+	Teams TeamMeeting `meta:"readOnly"`
 
-	Attendance Link
+	Attendance Link `meta:"readOnly"` // Link to MeetingAttendance
+}
+
+func (m Meeting) GetDatabaseID() int {
+	return m.DatabaseID
 }
 
 type TeamMeeting struct {
