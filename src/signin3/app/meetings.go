@@ -292,14 +292,21 @@ func (h *MeetingHandlers) Teams(w http.ResponseWriter, r *http.Request) {
 		}
 
 		type requestStruct struct {
-			TeamID int
-			Kind   string
+			TeamID *int
+			Kind   *string
 		}
 		request := requestStruct{}
 		err = json.Unmarshal(requestBody, &request)
 		if err != nil {
 			log.Error(err)
 			MalformedJSON(w, r)
+			return
+		}
+
+		missing := nilFields(request)
+		if len(missing) > 0 {
+			e := models.Error{Code: http.StatusBadRequest, Error: "Missing required fields: " + strings.Join(missing, ", ")}
+			writeError(w, r, e)
 			return
 		}
 
