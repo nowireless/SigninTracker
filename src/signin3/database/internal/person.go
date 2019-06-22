@@ -3,6 +3,7 @@ package internal
 import (
 	"database/sql"
 	"fmt"
+	"signin3/constants"
 	"signin3/models"
 
 	"github.com/jackc/pgx/pgtype"
@@ -28,7 +29,7 @@ type Person struct {
 func (p *Person) Model() models.Person {
 	result := models.Person{}
 	result.DatabaseID = int(p.PersonID)
-	result.URI = fmt.Sprintf("/people/%d", result.DatabaseID)
+	result.URI = fmt.Sprintf("%s/%d", constants.PeopleCollection, result.DatabaseID)
 
 	result.CheckInID = &p.CheckInID
 	result.FirstName = &p.FirstName
@@ -40,20 +41,20 @@ func (p *Person) Model() models.Person {
 		student := models.Student{}
 		student.SchoolID = getNullString(p.SchoolID)
 		student.SchoolEmail = getNullString(p.SchoolEmail)
-		student.Teams = makeIDLinks("/teams", p.StudentOf)
+		student.Teams = makeIDLinks(constants.TeamsCollection, p.StudentOf)
 
 		result.Student = &student
 	}
 
 	if len(p.MentorOf.Elements) > 0 {
 		mentor := models.Mentor{}
-		mentor.Teams = makeIDLinks("/teams", p.MentorOf)
+		mentor.Teams = makeIDLinks(constants.TeamsCollection, p.MentorOf)
 
 		result.Mentor = &mentor
 	}
 
-	result.ParentOf = makeIDLinks("/people", p.ParentOf)
-	result.Parents = makeIDLinks("/people", p.Parents)
+	result.ParentOf = makeIDLinks(constants.PeopleCollection, p.ParentOf)
+	result.Parents = makeIDLinks(constants.PeopleCollection, p.Parents)
 
 	// Static link to array of
 	result.Attendance = models.Link{URI: fmt.Sprintf("%s/attendance", result.URI)}

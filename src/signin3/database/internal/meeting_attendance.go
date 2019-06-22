@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"signin3/constants"
 	"signin3/models"
 )
 
@@ -16,8 +17,8 @@ type MeetingAttendance struct {
 
 func (ma *MeetingAttendance) Model() models.MeetingAttendance {
 	result := models.MeetingAttendance{}
-	result.PersonID = makeLink("/people", ma.PersonID)
-	result.MeetingID = makeLink("/meetings", ma.MeetingID)
+	result.PersonID = makeLink(constants.PeopleCollection, ma.PersonID)
+	result.MeetingID = makeLink(constants.MeetingsCollection, ma.MeetingID)
 	result.InTime = ma.InTime
 	result.OutTime = getNullString(ma.OutTime)
 

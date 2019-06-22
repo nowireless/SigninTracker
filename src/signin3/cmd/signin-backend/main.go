@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"runtime"
 	"signin3/api"
+	"signin3/constants"
 	"signin3/database"
 	"sync"
 	"time"
@@ -83,7 +84,7 @@ func serve(ctx context.Context, config Config) {
 
 	// API setup
 	log.Info("Initializing API")
-	err := api.NewAPI(config.API).Initialize(r.PathPrefix("/api/v1").Subrouter())
+	err := api.NewAPI(config.API).Initialize(r.PathPrefix(constants.APIBaseURI).Subrouter())
 	if err != nil {
 		log.Error(err)
 		log.Fatal("Failed to initializecpo API")

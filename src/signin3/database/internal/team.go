@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"signin3/constants"
 	"signin3/models"
 )
 
@@ -16,7 +17,7 @@ type Team struct {
 func (t *Team) Model() models.Team {
 	result := models.Team{}
 	result.DatabaseID = int(t.TeamID)
-	result.URI = fmt.Sprintf("/teams/%d", result.DatabaseID)
+	result.URI = fmt.Sprintf("%s/%d", constants.TeamsCollection, result.DatabaseID)
 
 	result.Competition = &t.Competition
 	result.Number = &t.Number

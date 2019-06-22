@@ -1,8 +1,8 @@
 package models
 
 type Meeting struct {
-	DatabaseID int    `meta:"readOnly"`
-	URI        string `meta:"readOnly"`
+	URI        string `meta:"readOnly" json:"@uri"`
+	DatabaseID int    `meta:"readOnly" json:"@databaseid"`
 
 	Day       *string `meta:"requiredOnCreate"`
 	StartTime *string `meta:"requiredOnCreate"`

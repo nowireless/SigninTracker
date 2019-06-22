@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"signin3/constants"
 	"signin3/database"
 	"signin3/models"
 	"signin3/tags"
@@ -278,7 +279,7 @@ func (h *MeetingHandlers) Teams(w http.ResponseWriter, r *http.Request) {
 			}
 
 			results = append(results, models.TeamMeeting{
-				Team: models.Link{URI: fmt.Sprintf("/teams/%d", tm.TeamID)},
+				Team: models.Link{URI: fmt.Sprintf("%s/%d", constants.TeamsCollection, tm.TeamID)},
 				Kind: tm.Kind,
 			})
 		}
@@ -520,7 +521,7 @@ func (h *MeetingHandlers) SignIns(w http.ResponseWriter, r *http.Request) {
 			}
 
 			results = append(results, models.SignIn{
-				Person: &models.Link{URI: fmt.Sprintf("/people/%d", si.PersonID)},
+				Person: &models.Link{URI: fmt.Sprintf("%s/%d", constants.PeopleCollection, si.PersonID)},
 				InTime: si.InTime,
 			})
 		}
@@ -661,7 +662,7 @@ func (h *MeetingHandlers) SignOuts(w http.ResponseWriter, r *http.Request) {
 			}
 
 			results = append(results, models.SignOut{
-				Person:  &models.Link{URI: fmt.Sprintf("/people/%d", so.PersonID)},
+				Person:  &models.Link{URI: fmt.Sprintf("%s/%d", constants.PeopleCollection, so.PersonID)},
 				OutTime: so.OutTime,
 			})
 		}

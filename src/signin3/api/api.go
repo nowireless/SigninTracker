@@ -35,7 +35,7 @@ func (api *API) Initialize(r *mux.Router) error {
 
 	// Register handlers
 	// Service Root
-	r.HandleFunc("", api.notImplemented).Methods("GET")
+	r.HandleFunc("", app.ServiceRoot).Methods("GET")
 
 	r.HandleFunc("/people", app.People.Collection).Methods("GET", "POST")
 	r.HandleFunc("/people/{id}", app.People.PersonID).Methods("GET", "PATCH", "DELETE")
