@@ -31,6 +31,8 @@ func (api *API) Initialize(r *mux.Router) error {
 		return err
 	}
 
+	// TODO: Redo uri parameters
+
 	// Register handlers
 	// Service Root
 	r.HandleFunc("", api.notImplemented).Methods("GET")
@@ -53,7 +55,7 @@ func (api *API) Initialize(r *mux.Router) error {
 	r.HandleFunc("/meetings/{id}/teams/{tid}", app.Meetings.TeamID).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/meetings/{id}/commitments", app.Meetings.Commitments).Methods("POST")
 	r.HandleFunc("/meetings/{id}/commitments/{pid}", app.Meetings.RemoveCommitment).Methods("DELETE")
-	r.HandleFunc("/meetings/{id}/signins", app.Meetings.SignIns).Methods("POST")
+	r.HandleFunc("/meetings/{id}/signins", app.Meetings.SignIns).Methods("GET", "POST")
 	r.HandleFunc("/meetings/{id}/signins/{pid}", app.Meetings.SignInsID).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/meetings/{id}/signouts", app.Meetings.SignOuts).Methods("GET", "POST")
 	r.HandleFunc("/meetings/{id}/signouts/{pid}", app.Meetings.SignOutsID).Methods("GET", "PATCH", "DELETE")
@@ -65,7 +67,7 @@ func (api *API) Initialize(r *mux.Router) error {
 	r.HandleFunc("/teams/{id}/mentors/{mid}", app.Teams.RemoveMentor).Methods("DELETE")
 	r.HandleFunc("/teams/{id}/students", app.Teams.Students).Methods("GET", "POST")
 	r.HandleFunc("/teams/{id}/students/{sid}", app.Teams.RemoveStudent).Methods("DELETE")
-	r.HandleFunc("/teams/{id}/meetings", app.Teams.Meetings).Methods("GET", "POST")
+	r.HandleFunc("/teams/{id}/meetings", app.Teams.Meetings).Methods("GET", "PATCH", "POST")
 	r.HandleFunc("/teams/{id}/meetings/{mid}", app.Teams.MeetingID).Methods("GET", "PATCH", "DELETE")
 
 	return nil

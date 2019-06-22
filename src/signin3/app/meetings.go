@@ -330,7 +330,7 @@ func (h *MeetingHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	teamID, err := parseInt(vars["id"])
+	teamID, err := parseInt(vars["tid"])
 	if err != nil {
 		InternalError(w, r, err, "Unable to team id")
 		return

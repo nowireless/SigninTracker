@@ -391,7 +391,7 @@ func (h *PersonHandlers) StudentOfID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Remove mentor from team
+	// Remove student from team
 
 	vars := mux.Vars(r)
 	id, err := parseInt(vars["id"])
