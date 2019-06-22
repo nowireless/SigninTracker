@@ -235,7 +235,7 @@ func (h *MeetingHandlers) Teams(w http.ResponseWriter, r *http.Request) {
 	panic("TODO")
 }
 
-func (h *MeetingHandlers) RemoveTeam(w http.ResponseWriter, r *http.Request) {
+func (h *MeetingHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 	panic("TODO")
 }
 

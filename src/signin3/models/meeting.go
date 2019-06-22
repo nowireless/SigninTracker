@@ -7,12 +7,13 @@ type Meeting struct {
 	Day       *string `meta:"requiredOnCreate"`
 	StartTime *string `meta:"requiredOnCreate"`
 	EndTime   *string `meta:"requiredOnCreate"`
+	Location  *string
 
 	Committed []Link `meta:"readOnly"`
-	SignedIn  []Link `meta:"readOnly"`
-	SingedOut []Link `meta:"readOnly"`
+	SignedIn  Link   `meta:"readOnly"`
+	SignedOut Link   `meta:"readOnly"`
 
-	Teams TeamMeeting `meta:"readOnly"`
+	Teams Link `meta:"readOnly"`
 
 	Attendance Link `meta:"readOnly"` // Link to MeetingAttendance
 }

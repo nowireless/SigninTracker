@@ -138,9 +138,8 @@ func (db *Database) UpdatePerson(model models.Person) error {
 	return err
 }
 
-func (db *Database) DeletePerson(model *models.Person) error {
+func (db *Database) DeletePerson(p *models.Person) error {
 	// TODO: Some how mark/(remove database id) to indicate that the model no longer represents a row in the db
-	person := internal.NewPerson(model)
-	_, err := db.DB.Exec("DELETE FROM PEOPLE WHERE personid = $1", person.PersonID)
+	_, err := db.DB.Exec("DELETE FROM PEOPLE WHERE personid = $1", p.DatabaseID)
 	return err
 }

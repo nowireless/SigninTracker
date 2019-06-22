@@ -50,7 +50,7 @@ func (api *API) Initialize(r *mux.Router) error {
 	r.HandleFunc("/meetings", app.Meetings.Collection).Methods("GET", "POST")
 	r.HandleFunc("/meetings/{id}", app.Meetings.MeetingID).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/meetings/{id}/teams", app.Meetings.Teams).Methods("GET", "POST")
-	r.HandleFunc("/meetings/{id}/teams/{tid}", app.Meetings.RemoveTeam).Methods("DELETE")
+	r.HandleFunc("/meetings/{id}/teams/{tid}", app.Meetings.TeamID).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/meetings/{id}/commitments", app.Meetings.Commitments).Methods("POST")
 	r.HandleFunc("/meetings/{id}/commitments/{pid}", app.Meetings.RemoveCommitment).Methods("DELETE")
 	r.HandleFunc("/meetings/{id}/signins", app.Meetings.SignIns).Methods("POST")
