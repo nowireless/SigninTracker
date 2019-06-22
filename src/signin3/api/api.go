@@ -43,9 +43,9 @@ func (api *API) Initialize(r *mux.Router) error {
 	r.HandleFunc("/people/{id}/studentOf", app.People.StudentOf).Methods("POST")
 	r.HandleFunc("/people/{id}/studentOf/{tid}", app.People.StudentOfID).Methods("DELETE")
 	r.HandleFunc("/people/{id}/parents", app.People.Parents).Methods("POST")
-	r.HandleFunc("/people/{id}/parents/{pid}", app.People.ParentsID).Methods("DELETE")
+	r.HandleFunc("/people/{id}/parents/{pid}", app.People.ParentsID).Methods("GET", "PATCH", "DELETE")
 	r.HandleFunc("/people/{id}/parentsOf", app.People.ParentOf).Methods("GET", "POST")
-	r.HandleFunc("/people/{id}/parentsOf/{sid}", app.People.ParentOfID).Methods("DELETE")
+	r.HandleFunc("/people/{id}/parentsOf/{sid}", app.People.ParentOfID).Methods("GET", "PATCH", "DELETE")
 
 	r.HandleFunc("/meetings", app.Meetings.Collection).Methods("GET", "POST")
 	r.HandleFunc("/meetings/{id}", app.Meetings.MeetingID).Methods("GET", "PATCH", "DELETE")

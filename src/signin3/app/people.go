@@ -233,12 +233,57 @@ func (h *PersonHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PersonHandlers) MentorOf(w http.ResponseWriter, r *http.Request) {
+	// Add person as mentor to team
+
 	if r.Method != http.MethodPost {
 		MethodNotAllowed(w, r)
 		return
 	}
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
+		return
+	}
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
 
-	NotImplemented(w, r)
+	// Extract team id from request body
+	type requestStruct struct {
+		TeamID int
+	}
+	request := requestStruct{}
+	err = json.Unmarshal(requestBody, &request)
+	if err != nil {
+		log.Error(err)
+		MalformedJSON(w, r)
+		return
+	}
+
+	// Exec query
+	_, err = h.DB.DB.Exec(
+		`INSERT INTO mentors(personid, teamid) VALUES ($1, $2)`,
+		id, request.TeamID,
+	)
+	if err != nil {
+		// TODO the following should maybe move to database package?
+		// Create a custom error struct for friendlier error handle
+		// Does the team id exist?
+		// 23503 - foreign_key_violation
+		if pgxErr, ok := err.(pgx.PgError); ok && pgxErr.Code == "23503" {
+			e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
+			writeError(w, r, e)
+			return
+		}
+		InternalError(w, r, err, "Database Error")
+		return
+
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *PersonHandlers) MentorOfID(w http.ResponseWriter, r *http.Request) {
@@ -247,16 +292,97 @@ func (h *PersonHandlers) MentorOfID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	NotImplemented(w, r)
+	// Remove mentor from team
+
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse person id")
+		return
+	}
+
+	teamId, err := parseInt(vars["tid"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse team id")
+		return
+	}
+
+	result, err := h.DB.DB.Exec(
+		"DELETE FROM mentors WHERE personid = $1 AND  teamid = $2",
+		id, teamId,
+	)
+	if err != nil {
+		InternalError(w, r, err, "Database Error")
+		return
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	if rows == 0 {
+		// No entry was deleted
+		e := models.Error{Code: http.StatusBadRequest, Error: "No matching person and team mentor relationship"}
+		writeError(w, r, e)
+		return
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *PersonHandlers) StudentOf(w http.ResponseWriter, r *http.Request) {
+	// Add person as student to team
+
 	if r.Method != http.MethodPost {
 		MethodNotAllowed(w, r)
 		return
 	}
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
+		return
+	}
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
 
-	NotImplemented(w, r)
+	// Extract team id from request body
+	type requestStruct struct {
+		TeamID int
+	}
+	request := requestStruct{}
+	err = json.Unmarshal(requestBody, &request)
+	if err != nil {
+		log.Error(err)
+		MalformedJSON(w, r)
+		return
+	}
+
+	// Exec query
+	_, err = h.DB.DB.Exec(
+		`INSERT INTO students(personid, teamid) VALUES ($1, $2)`,
+		id, request.TeamID,
+	)
+	if err != nil {
+		// TODO the following should maybe move to database package?
+		// Create a custom error struct for friendlier error handle
+		// Does the team id exist?
+		// 23503 - foreign_key_violation
+		if pgxErr, ok := err.(pgx.PgError); ok && pgxErr.Code == "23503" {
+			e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
+			writeError(w, r, e)
+			return
+		}
+		InternalError(w, r, err, "Database Error")
+		return
+
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *PersonHandlers) StudentOfID(w http.ResponseWriter, r *http.Request) {
@@ -265,41 +391,254 @@ func (h *PersonHandlers) StudentOfID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	NotImplemented(w, r)
+	// Remove mentor from team
+
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse person id")
+		return
+	}
+
+	teamID, err := parseInt(vars["tid"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse team id")
+		return
+	}
+
+	log.Info("Deleting mentor relationship: PersonID ", id, " TeamID ", teamID)
+
+	result, err := h.DB.DB.Exec(
+		"DELETE FROM students WHERE personid = $1 AND teamid = $2",
+		id, teamID,
+	)
+	if err != nil {
+		InternalError(w, r, err, "Database Error")
+		return
+	}
+
+	rows, err := result.RowsAffected()
+	if err != nil {
+		panic(err)
+	}
+	if rows == 0 {
+		// No entry was deleted
+		e := models.Error{Code: http.StatusBadRequest, Error: "No matching person and team student relationship"}
+		writeError(w, r, e)
+		return
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *PersonHandlers) Parents(w http.ResponseWriter, r *http.Request) {
+	// Add person as mentor to team
+
 	if r.Method != http.MethodPost {
 		MethodNotAllowed(w, r)
 		return
 	}
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
+		return
+	}
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
 
-	NotImplemented(w, r)
+	// Extract team id from request body
+	type requestStruct struct {
+		ParentID int
+		Relation string
+	}
+	request := requestStruct{}
+	err = json.Unmarshal(requestBody, &request)
+	if err != nil {
+		log.Error(err)
+		MalformedJSON(w, r)
+		return
+	}
+
+	// Exec query
+	_, err = h.DB.DB.Exec(
+		`INSERT INTO parents(studentid, parentid, relation) VALUES ($1, $2, $3)`,
+		id, request.ParentID, request.Relation,
+	)
+	if err != nil {
+		// TODO the following should maybe move to database package?
+		// Create a custom error struct for friendlier error handle
+		badRequestErrors := map[string]bool{}
+		badRequestErrors["23503"] = true // foreign_key_violation - The parent ID does not exist
+		badRequestErrors["22P02"] = true // invalid_text_representation - The parent relation is invalid
+
+		if pgxErr, ok := err.(pgx.PgError); ok && badRequestErrors[pgxErr.Code] {
+			e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
+			writeError(w, r, e)
+			return
+		}
+		InternalError(w, r, err, "Database Error")
+		return
+
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h *PersonHandlers) ParentsID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
 		return
 	}
 
-	NotImplemented(w, r)
+	parentID, err := parseInt(vars["pid"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse parent id")
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		NotImplemented(w, r)
+	case http.MethodPatch:
+		NotImplemented(w, r)
+	case http.MethodDelete:
+		log.Info("Deleting parent relationship: ParentID ", parentID, " StudentID ", id)
+		result, err := h.DB.DB.Exec(
+			"DELETE FROM parents WHERE parentid = $1 AND studentid = $2",
+			parentID, id,
+		)
+		if err != nil {
+			InternalError(w, r, err, "Database Error")
+			return
+		}
+
+		rows, err := result.RowsAffected()
+		if err != nil {
+			panic(err)
+		}
+		if rows == 0 {
+			// No entry was deleted
+			e := models.Error{Code: http.StatusBadRequest, Error: "No matching person and team student relationship"}
+			writeError(w, r, e)
+			return
+		}
+
+		// Return nothing
+		// TODO: Return deleted relationship?
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		MethodNotAllowed(w, r)
+	}
 }
 
 func (h *PersonHandlers) ParentOf(w http.ResponseWriter, r *http.Request) {
+	// Add person as mentor to team
+
 	if r.Method != http.MethodPost {
 		MethodNotAllowed(w, r)
 		return
 	}
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
+		return
+	}
+	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
 
-	NotImplemented(w, r)
-}
-
-func (h *PersonHandlers) ParentOfID(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		MethodNotAllowed(w, r)
+	// Extract team id from request body
+	type requestStruct struct {
+		StudentID      int
+		ParentRelation string
+	}
+	request := requestStruct{}
+	err = json.Unmarshal(requestBody, &request)
+	if err != nil {
+		log.Error(err)
+		MalformedJSON(w, r)
 		return
 	}
 
-	NotImplemented(w, r)
+	// Exec query
+	_, err = h.DB.DB.Exec(
+		`INSERT INTO parents(parentid, studentid, relation) VALUES ($1, $2, $3)`,
+		id, request.StudentID, request.ParentRelation,
+	)
+	if err != nil {
+		// TODO the following should maybe move to database package?
+		// Create a custom error struct for friendlier error handle
+		badRequestErrors := map[string]bool{}
+		badRequestErrors["23503"] = true // foreign_key_violation - The parent ID does not exist
+		badRequestErrors["22P02"] = true // invalid_text_representation - The parent relation is invalid
+
+		if pgxErr, ok := err.(pgx.PgError); ok && badRequestErrors[pgxErr.Code] {
+			e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
+			writeError(w, r, e)
+			return
+		}
+		InternalError(w, r, err, "Database Error")
+		return
+	}
+
+	// Return nothing
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (h *PersonHandlers) ParentOfID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := parseInt(vars["id"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse id")
+		return
+	}
+
+	studentID, err := parseInt(vars["sid"])
+	if err != nil {
+		InternalError(w, r, err, "Unable to parse student id")
+		return
+	}
+
+	switch r.Method {
+	case http.MethodGet:
+		NotImplemented(w, r)
+	case http.MethodPatch:
+		NotImplemented(w, r)
+	case http.MethodDelete:
+		log.Info("Deleting parent relationship: ParentID ", id, " StudentID ", studentID)
+		result, err := h.DB.DB.Exec(
+			"DELETE FROM parents WHERE parentid = $1 AND studentid = $2",
+			id, studentID,
+		)
+		if err != nil {
+			InternalError(w, r, err, "Database Error")
+			return
+		}
+
+		rows, err := result.RowsAffected()
+		if err != nil {
+			panic(err)
+		}
+		if rows == 0 {
+			// No entry was deleted
+			e := models.Error{Code: http.StatusBadRequest, Error: "No matching person and team student relationship"}
+			writeError(w, r, e)
+			return
+		}
+
+		// Return nothing
+		// TODO: Return deleted relationship?
+		w.WriteHeader(http.StatusNoContent)
+	default:
+		MethodNotAllowed(w, r)
+	}
 }
