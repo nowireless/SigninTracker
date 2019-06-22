@@ -131,7 +131,7 @@ func (h *MeetingHandlers) MeetingID(w http.ResponseWriter, r *http.Request) {
 		// TODO
 
 		// Check the patch to see if it modifying readonly fields
-		violations := tags.CheckPatchReadonly(models.Person{}, patch)
+		violations := tags.CheckPatchReadonly(models.Meeting{}, patch)
 		if len(violations) > 0 {
 			e := models.Error{
 				Code:  http.StatusBadRequest,

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"signin3/constants"
 	"signin3/database"
 	"signin3/models"
 	"signin3/tags"
@@ -134,7 +135,7 @@ func (h *TeamHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 		// TODO
 
 		// Check the patch to see if it modifying readonly fields
-		violations := tags.CheckPatchReadonly(models.Person{}, patch)
+		violations := tags.CheckPatchReadonly(models.Team{}, patch)
 		if len(violations) > 0 {
 			e := models.Error{
 				Code:  http.StatusBadRequest,
@@ -464,7 +465,7 @@ func (h *TeamHandlers) Meetings(w http.ResponseWriter, r *http.Request) {
 			}
 
 			results = append(results, models.TeamMeeting{
-				Team: models.Link{URI: fmt.Sprintf("/meetings/%d", tm.MeetingID)},
+				Team: models.Link{URI: fmt.Sprintf("%s/%d", constants.TeamsCollection, tm.MeetingID)},
 				Kind: tm.Kind,
 			})
 		}

@@ -29,8 +29,8 @@ func (db *Database) GetTeams() ([]models.Team, error) {
 func (db *Database) GetTeam(id int) (*models.Team, error) {
 	row := db.DB.QueryRowx(`
 		SELECT teamid, compeition, number, name
-		WHERE teamid = $1
 		FROM teams
+		WHERE teamid = $1
 	`, id)
 	if err := row.Err(); err != nil {
 		return nil, err
@@ -50,7 +50,7 @@ func (db *Database) CreateTeam(mTeam *models.Team) error {
 
 	row := db.DB.QueryRowx(`
 		INSERT INTO teams(compeition, number, name)
-		VALUES ($1, $2, $3)`,
+		VALUES ($1, $2, $3) RETURNING teamid`,
 		team.Competition,
 		team.Number,
 		team.Name,
@@ -76,10 +76,10 @@ func (db *Database) UpdateTeam(model models.Team) error {
 	log.Info("Updating team with ID: ", team.TeamID)
 
 	_, err := db.DB.Exec(`
-		UPDATE people SET
+		UPDATE teams SET
 			compeition = $1,
 			number     = $2,
-			name       = $3,
+			name       = $3
 		WHERE teamid   = $4;
 		`,
 		team.Competition,
