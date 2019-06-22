@@ -87,10 +87,10 @@ INSERT INTO students(personid, teamid) VALUES (8, 1);
 -- Times in ISO 8601
 
 -- Create meeting
-INSERT INTO meetings(meetingid, date, starttime, endtime, location, kind)
-    VALUES (0, '6-8-2019', '10:00:00 CST', '12:00:00 CST', 'Kennedy High School', 'General');
+INSERT INTO meetings(meetingid, date, starttime, endtime, location)
+    VALUES (0, '6-8-2019', '10:00:00 CST', '12:00:00 CST', 'Kennedy High School');
 
-INSERT INTO team_meetings(teamid, meetingid) VALUES (1, 0);
+INSERT INTO team_meetings(teamid, meetingid, kind) VALUES (1, 0, 'General');
 
 -- Sign ins
 
@@ -131,3 +131,7 @@ INSERT INTO signed_in(personid, meetingid, intime)
     VALUES (9, 0, '10:00:00 CST');
 INSERT INTO signed_out(personid, meetingid, outtime)
     VALUES (9, 0, '12:00:00 CST');
+
+-- Jonathan Hill
+INSERT INTO signed_in(personid, meetingid, intime)
+    VALUES (7, 0, '10:00:00 CST');

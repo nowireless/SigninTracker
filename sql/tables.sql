@@ -26,8 +26,7 @@ CREATE TABLE meetings(
   Date      DATE NOT NULL,
   StartTime TIME NOT NULL,
   EndTime   TIME NOT NULL,
-  Location  TEXT NOT NULL, -- TOOD make location its own table?
-  Kind      TEXT NOT NULL
+  Location  TEXT NOT NULL -- TOOD make location its own table?
 );
 
 DROP TABLE IF EXISTS teams;
@@ -47,6 +46,7 @@ CREATE TABLE team_meetings (
 
   TeamID    INTEGER REFERENCES teams (TeamID)       ON DELETE SET NULL,
   MeetingID INTEGER REFERENCES meetings (MeetingID) ON DELETE SET NULL,
+  Kind      TEXT NOT NULL,
 
   UNIQUE (TeamID, MeetingID)
 );
