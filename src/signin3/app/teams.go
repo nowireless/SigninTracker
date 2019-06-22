@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -59,7 +60,12 @@ func (h *TeamHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// TODO the following should maybe move to database package?
 			// Create a custom error struct for friendlier error handle
-			if pgxErr, ok := err.(pgx.PgError); ok && pgxErr.Code == "23505" {
+			badRequestErrors := map[string]bool{}
+			badRequestErrors["23503"] = true // foreign_key_violation - The team ID does not exist
+			badRequestErrors["22P02"] = true // TODO
+			badRequestErrors["23505"] = true // TODO
+
+			if pgxErr, ok := err.(pgx.PgError); ok && badRequestErrors[pgxErr.Code] {
 				e := models.Error{Code: http.StatusBadRequest, Error: pgxErr.Message}
 				writeError(w, r, e)
 				return
@@ -67,6 +73,8 @@ func (h *TeamHandlers) Collection(w http.ResponseWriter, r *http.Request) {
 			InternalError(w, r, err, "Database Error")
 			return
 		}
+
+		log.Info("Created Team id: ", m.DatabaseID)
 
 		result, err := h.DB.GetTeam(m.DatabaseID)
 		if err != nil {
@@ -98,7 +106,10 @@ func (h *TeamHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 		// TODO add check for if the ID does not exist, add special error in database package.
 		// ERRO[0708] sql: no rows in result set
 		person, err := h.DB.GetTeam(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -136,7 +147,10 @@ func (h *TeamHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 		// TODO Begin transaction
 		// Fetch current values of person
 		person, err := h.DB.GetTeam(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -186,7 +200,10 @@ func (h *TeamHandlers) TeamID(w http.ResponseWriter, r *http.Request) {
 
 		// Get person
 		team, err := h.DB.GetTeam(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}

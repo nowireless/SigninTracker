@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -98,7 +99,10 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 		// TODO add check for if the ID does not exist, add special error in database package.
 		// ERRO[0708] sql: no rows in result set
 		person, err := h.DB.GetPerson(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -136,7 +140,10 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 		// TODO Begin transaction
 		// Fetch current values of person
 		person, err := h.DB.GetPerson(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -193,7 +200,10 @@ func (h *PersonHandlers) PersonID(w http.ResponseWriter, r *http.Request) {
 
 		// Perform deletion
 		err = h.DB.DeletePerson(person)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -220,6 +230,8 @@ func (h *PersonHandlers) Attendance(w http.ResponseWriter, r *http.Request) {
 		InternalError(w, r, err, "Unable to parse database id")
 		return
 	}
+
+	// TODO check that person exists
 
 	log.Info("Getting attendance for person id: ", id)
 

@@ -52,6 +52,11 @@ func InternalError(w http.ResponseWriter, r *http.Request, err error, errorMsg s
 	writeError(w, r, e)
 }
 
+func NotFound(w http.ResponseWriter, r *http.Request) {
+	log.Warn("Resource not found: ", r.RequestURI)
+	w.WriteHeader(http.StatusNotFound)
+}
+
 func NotImplemented(w http.ResponseWriter, r *http.Request) {
 	e := models.Error{
 		Code:  http.StatusNotImplemented,

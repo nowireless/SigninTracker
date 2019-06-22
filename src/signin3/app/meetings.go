@@ -1,6 +1,7 @@
 package app
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -98,7 +99,10 @@ func (h *MeetingHandlers) MeetingID(w http.ResponseWriter, r *http.Request) {
 		// TODO add check for if the ID does not exist, add special error in database package.
 		// ERRO[0708] sql: no rows in result set
 		person, err := h.DB.GetMeeting(int(id))
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
@@ -113,7 +117,10 @@ func (h *MeetingHandlers) MeetingID(w http.ResponseWriter, r *http.Request) {
 		// Check for malformed JSON
 		patch := map[string]interface{}{}
 		err = json.Unmarshal(requestBody, &patch)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			log.Error(err)
 			MalformedJSON(w, r)
 			return
@@ -193,7 +200,10 @@ func (h *MeetingHandlers) MeetingID(w http.ResponseWriter, r *http.Request) {
 
 		// Perform deletion
 		err = h.DB.DeleteMeeting(meeting)
-		if err != nil {
+		if err == sql.ErrNoRows {
+			NotFound(w, r)
+			return
+		} else if err != nil {
 			InternalError(w, r, err, "Database error")
 			return
 		}
